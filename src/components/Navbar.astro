@@ -1,22 +1,19 @@
+---
+import PrimaryButton from './ui/PrimaryButton.astro'
+---
+
 <nav class="border-gray-200 bg-gray-900">
   <div
     class="mx-auto w-full max-w-screen-lg flex flex-wrap items-center justify-between py-4"
   >
-    <a
-      href="https://flowbite.com/"
-      class="flex items-center space-x-3 rtl:space-x-reverse"
-    >
+    <div class="flex items-center space-x-3 rtl:space-x-reverse">
       <img src="/images/logo.webp" class="h-8" alt="McLovin Logo" />
       <span class="text-2xl font-semibold whitespace-nowrap text-white"
         >My McLovin ID</span
       >
-    </a>
+    </div>
     <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-      <button
-        type="button"
-        class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-800 font-medium rounded-lg text-sm px-4 py-2 text-center"
-        >Get started</button
-      >
+      <PrimaryButton label="Get started" />
       <button
         data-collapse-toggle="navbar-cta"
         type="button"
