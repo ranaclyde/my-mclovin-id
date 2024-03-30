@@ -7,13 +7,12 @@ import Input from '@/components/Input.astro'
   <main class="max-w-5xl mx-auto">
     <h1 class="text-5xl text-white font-bold text-center">Welcome to Astro</h1>
     <section class="flex gap-4 my-8">
-      <div>
-        <canvas
-          id="myCanvas"
-          width="527"
-          height="326"
-          style="background-color: aqua;"></canvas>
-      </div>
+      <canvas
+        id="myCanvas"
+        class="rounded-md bg-transparent border border-slate-400"
+        width="527"
+        height="326"
+        style="background-color: aqua;"></canvas>
       <form id="form" class="w-full">
         <Input id="name" label="Name" />
         <Input id="dob" type="date" label="DOB" />
