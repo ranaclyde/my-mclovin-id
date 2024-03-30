@@ -1,0 +1,70 @@
+<canvas
+  id="mclovin-canvas"
+  class="rounded-md bg-transparent border border-slate-400"
+  width="527"
+  height="326"></canvas>
+
+<script>
+  import { mclovin, fontSize } from '@/const/mclovinData'
+  import { formattedDate } from '@/utils/formattedDate'
+
+  const canvas = document.querySelector('#mclovin-canvas') as HTMLCanvasElement
+  const ctx = canvas.getContext('2d')!
+
+  const mcLovinImg = new Image()
+  mcLovinImg.onload = () => {
+    drawCanvas()
+  }
+  mcLovinImg.src = '/images/mclovin.webp'
+
+  document.querySelector('#form')?.addEventListener('input', function () {
+    drawCanvas()
+  })
+
+  const name = document.querySelector('#name') as HTMLInputElement
+  const dob = document.querySelector('#dob') as HTMLInputElement
+  const sex = document.querySelector('#sex') as HTMLSelectElement
+
+  function drawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height) // Limpiar el canvas
+    ctx.drawImage(mcLovinImg, 0, 0, canvas.width, canvas.height)
+
+    ctx.font = `bold ${fontSize.title / 3}px Arial`
+    ctx.fillText(
+      formattedDate(dob?.value) || mclovin.dob.value,
+      mclovin.dob.posX / 3,
+      mclovin.dob.posY / 3
+    ) // DOB
+    ctx.fillText(
+      updateExpDate() || mclovin.exp.value,
+      mclovin.exp.posX / 3,
+      mclovin.exp.posY / 3
+    ) // EXP
+    ctx.fillText(
+      name?.value || mclovin.name.value,
+      mclovin.name.posX / 3,
+      mclovin.name.posY / 3
+    ) // NAME
+
+    ctx.font = `bold ${fontSize.subtitle / 3}px Arial`
+    ctx.fillText(
+      sex?.value || mclovin.sex.value,
+      mclovin.sex.posX / 3,
+      mclovin.sex.posY / 3
+    ) // SEX
+    ctx.fillText(
+      formattedDate(new Date().toDateString()) || mclovin.issueDate.value,
+      mclovin.issueDate.posX / 3,
+      mclovin.issueDate.posY / 3
+    ) // ISSUE DATE
+  }
+
+  function updateExpDate() {
+    if (!dob.value) return
+    const dobDate = formattedDate(dob.value)
+    const extractDate = dobDate?.split('/')
+    if (!extractDate) return
+    const year = new Date().getFullYear() + 10
+    return `${extractDate[0]}/${extractDate[1]}/${year}`
+  }
+</script>

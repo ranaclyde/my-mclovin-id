@@ -1,0 +1,16 @@
+---
+import Input from '@/components/ui/Input.astro'
+import McLovinCanvas from '@/components/McLovinCanvas.astro'
+import Select from '@/components/ui/Select.astro'
+
+import { genresOptions } from '@/const/genres'
+---
+
+<section class="flex gap-4 my-8">
+  <McLovinCanvas />
+  <form id="form" class="w-full">
+    <Input id="name" label="Name" />
+    <Input id="dob" type="date" label="DOB" />
+    <Select id="sex" label="Genre" options={genresOptions} />
+  </form>
+</section>
