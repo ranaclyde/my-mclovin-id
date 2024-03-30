@@ -5,6 +5,7 @@ interface Props {
   type?: 'text' | 'date' | 'email' | 'password'
   placeholder?: string
   isRequired?: boolean
+  class?: string
 }
 
 const {
@@ -13,10 +14,11 @@ const {
   type = 'text',
   placeholder,
   isRequired = false,
+  class: className,
 } = Astro.props
 ---
 
-<div class="mb-5">
+<div class:list={className}>
   <label class="block mb-2 text-sm font-medium text-white" for={id}>
     {label}
   </label>
