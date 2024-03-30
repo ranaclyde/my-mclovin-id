@@ -1,6 +1,13 @@
 ---
+import Select from '@/components/Select.astro'
 import Layout from '../layouts/Layout.astro'
 import Input from '@/components/Input.astro'
+
+const genresOptions = [
+  { value: 'F', text: 'Female' },
+  { value: 'M', text: 'Male' },
+  { value: 'O', text: 'Other' },
+]
 ---
 
 <Layout title="Welcome to Astro.">
@@ -16,6 +23,7 @@ import Input from '@/components/Input.astro'
       <form id="form" class="w-full">
         <Input id="name" label="Name" />
         <Input id="dob" type="date" label="DOB" />
+        <Select id="sex" label="Genre" options={genresOptions} />
         <button
           type="submit"
           class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -76,6 +84,7 @@ import Input from '@/components/Input.astro'
 
   const name = document.getElementById('name') as HTMLInputElement
   const dob = document.getElementById('dob') as HTMLInputElement
+  const sex = document.getElementById('sex') as HTMLSelectElement
 
   function drawCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height) // Limpiar el canvas
@@ -99,7 +108,11 @@ import Input from '@/components/Input.astro'
     ) // NAME
 
     ctx.font = `bold ${fontSize.subtitle / 3}px Arial`
-    ctx.fillText('M', mclovin.sex.posX / 3, mclovin.sex.posY / 3) // SEX
+    ctx.fillText(
+      sex?.value || mclovin.sex.value,
+      mclovin.sex.posX / 3,
+      mclovin.sex.posY / 3
+    ) // SEX
     ctx.fillText(
       formattedDate(new Date().toDateString()) || mclovin.issueDate.value,
       mclovin.issueDate.posX / 3,
