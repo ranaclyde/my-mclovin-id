@@ -3,11 +3,7 @@ import Select from '@/components/ui/Select.astro'
 import Layout from '@/layouts/Layout.astro'
 import Input from '@/components/ui/Input.astro'
 
-const genresOptions = [
-  { value: 'F', text: 'Female' },
-  { value: 'M', text: 'Male' },
-  { value: 'O', text: 'Other' },
-]
+import { genresOptions } from '@/const/genres'
 ---
 
 <Layout title="Welcome to Astro.">
@@ -30,42 +26,10 @@ const genresOptions = [
 </Layout>
 
 <script>
-  const canvas = document.getElementById('myCanvas') as HTMLCanvasElement
+  import { mclovin, fontSize } from '@/const/mclovinData'
+
+  const canvas = document.querySelector('#myCanvas') as HTMLCanvasElement
   const ctx = canvas.getContext('2d')!
-
-  // CONST
-  const mclovin = {
-    name: {
-      value: 'McLOVIN',
-      posX: 30,
-      posY: 820,
-    },
-    dob: {
-      value: '06/03/1981',
-      posX: 700,
-      posY: 364,
-    },
-    exp: {
-      value: '06/03/2008',
-      posX: 1160,
-      posY: 364,
-    },
-    sex: {
-      value: 'M',
-      posX: 1244,
-      posY: 477,
-    },
-    issueDate: {
-      value: '06/18/1998',
-      posX: 592,
-      posY: 610,
-    },
-  }
-
-  const fontSize = {
-    title: 65,
-    subtitle: 36,
-  }
 
   const mcLovinImg = new Image()
   mcLovinImg.onload = () => {
@@ -73,13 +37,13 @@ const genresOptions = [
   }
   mcLovinImg.src = '/images/mclovin.webp'
 
-  document.getElementById('form')?.addEventListener('input', function () {
+  document.querySelector('#form')?.addEventListener('input', function () {
     drawCanvas()
   })
 
-  const name = document.getElementById('name') as HTMLInputElement
-  const dob = document.getElementById('dob') as HTMLInputElement
-  const sex = document.getElementById('sex') as HTMLSelectElement
+  const name = document.querySelector('#name') as HTMLInputElement
+  const dob = document.querySelector('#dob') as HTMLInputElement
+  const sex = document.querySelector('#sex') as HTMLSelectElement
 
   function drawCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height) // Limpiar el canvas
