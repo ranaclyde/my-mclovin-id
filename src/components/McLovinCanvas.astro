@@ -15,6 +15,13 @@
     src="images/mclovin-empty-id.webp"
     alt="Empty McLovin ID"
   />
+
+  <img
+    hidden
+    id="mcLovinFace"
+    src="images/mclovin-face.webp"
+    alt="McLovin Face ID"
+  />
 </div>
 
 <script>
@@ -25,6 +32,9 @@
   const ctx = canvas.getContext('2d')!
 
   const $mcLovinID = document.querySelector('#mcLovinID') as HTMLImageElement
+  const $mcLovinFace = document.querySelector(
+    '#mcLovinFace'
+  ) as HTMLImageElement
 
   document.querySelector('#form')?.addEventListener('input', function () {
     drawCanvas()
@@ -37,6 +47,13 @@
   function drawCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height) // Limpiar el canvas
     ctx.drawImage($mcLovinID, 0, 0, canvas.width, canvas.height)
+    ctx.drawImage(
+      $mcLovinFace,
+      mclovin.photo.posX / 3,
+      mclovin.photo.posY / 3,
+      $mcLovinFace.width / 3,
+      $mcLovinFace.height / 3
+    )
 
     ctx.font = `bold ${fontSize.title / 3}px Arial`
     ctx.fillText(
