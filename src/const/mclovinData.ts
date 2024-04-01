@@ -1,4 +1,9 @@
 export const mclovin = {
+  photo: {
+    value: 'McLovin face',
+    posX: 45,
+    posY: 30,
+  },
   name: {
     value: 'McLOVIN',
     posX: 30,
