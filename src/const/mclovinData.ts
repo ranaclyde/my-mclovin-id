@@ -29,6 +29,11 @@ export const mclovin = {
     posX: 592,
     posY: 610,
   },
+  sign: {
+    value: 'McLovin sign',
+    posX: 660,
+    posY: 645,
+  },
 }
 
 export const fontSize = {

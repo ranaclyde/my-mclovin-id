@@ -22,6 +22,13 @@
     src="images/mclovin-face.webp"
     alt="McLovin Face ID"
   />
+
+  <img
+    hidden
+    id="mcLovinSign"
+    src="images/mclovin-sign.webp"
+    alt="McLovin Sign"
+  />
 </div>
 
 <script>
@@ -34,6 +41,9 @@
   const $mcLovinID = document.querySelector('#mcLovinID') as HTMLImageElement
   const $mcLovinFace = document.querySelector(
     '#mcLovinFace'
+  ) as HTMLImageElement
+  const $mcLovinSign = document.querySelector(
+    '#mcLovinSign'
   ) as HTMLImageElement
 
   document.querySelector('#form')?.addEventListener('input', function () {
@@ -50,8 +60,11 @@
   })
 
   function drawCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height) // Limpiar el canvas
+    // Clean canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    // Draw empty ID
     ctx.drawImage($mcLovinID, 0, 0, canvas.width, canvas.height)
+    // Draw McLovin photo
     ctx.drawImage(
       !!photo?.src ? photo : $mcLovinFace,
       mclovin.photo.posX / 3,
@@ -59,35 +72,48 @@
       $mcLovinFace.width / 3,
       $mcLovinFace.height / 3
     )
+    // Draw McLovin sign
+    ctx.drawImage(
+      $mcLovinSign,
+      mclovin.sign.posX / 3,
+      mclovin.sign.posY / 3,
+      $mcLovinSign.width / 4,
+      $mcLovinSign.height / 4
+    )
 
     ctx.font = `bold ${fontSize.title / 3}px Arial`
+    // DOB
     ctx.fillText(
       formattedDate(dob?.value) || mclovin.dob.value,
       mclovin.dob.posX / 3,
       mclovin.dob.posY / 3
-    ) // DOB
+    )
+    // EXP
     ctx.fillText(
       updateExpDate() || mclovin.exp.value,
       mclovin.exp.posX / 3,
       mclovin.exp.posY / 3
-    ) // EXP
+    )
+    // NAME
     ctx.fillText(
       name?.value || mclovin.name.value,
       mclovin.name.posX / 3,
       mclovin.name.posY / 3
-    ) // NAME
+    )
 
     ctx.font = `bold ${fontSize.subtitle / 3}px Arial`
+    // SEX
     ctx.fillText(
       sex?.value || mclovin.sex.value,
       mclovin.sex.posX / 3,
       mclovin.sex.posY / 3
-    ) // SEX
+    )
+    // ISSUE DATE
     ctx.fillText(
       formattedDate(new Date().toDateString()) || mclovin.issueDate.value,
       mclovin.issueDate.posX / 3,
       mclovin.issueDate.posY / 3
-    ) // ISSUE DATE
+    )
   }
 
   function updateExpDate() {
