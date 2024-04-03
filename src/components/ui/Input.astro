@@ -1,9 +1,9 @@
 ---
-interface Props {
+import type { HTMLAttributes } from 'astro/types'
+interface Props extends Omit<HTMLAttributes<'input'>, 'required'> {
   id: string
   label: string
   type?: 'text' | 'date' | 'email' | 'password' | 'file'
-  placeholder?: string
   isRequired?: boolean
   class?: string
 }
@@ -12,9 +12,9 @@ const {
   id,
   label,
   type = 'text',
-  placeholder,
   isRequired = false,
   class: className,
+  ...otherProps
 } = Astro.props
 
 const isInputFile = type === 'file'
@@ -33,8 +33,8 @@ const isInputFile = type === 'file'
       'border cursor-pointer text-gray-400 focus:outline-none': isInputFile,
     }}
     class="block w-full text-sm rounded-lg bg-gray-700 border-gray-600 placeholder-gray-400"
-    placeholder={placeholder}
     required={isRequired}
+    {...otherProps}
   />
 </div>
 
