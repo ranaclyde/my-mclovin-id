@@ -43,12 +43,17 @@
   const name = document.querySelector('#name') as HTMLInputElement
   const dob = document.querySelector('#dob') as HTMLInputElement
   const sex = document.querySelector('#sex') as HTMLSelectElement
+  const photo = document.querySelector('#croppedImage') as HTMLImageElement
+
+  photo?.addEventListener('load', () => {
+    drawCanvas()
+  })
 
   function drawCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height) // Limpiar el canvas
     ctx.drawImage($mcLovinID, 0, 0, canvas.width, canvas.height)
     ctx.drawImage(
-      $mcLovinFace,
+      !!photo?.src ? photo : $mcLovinFace,
       mclovin.photo.posX / 3,
       mclovin.photo.posY / 3,
       $mcLovinFace.width / 3,

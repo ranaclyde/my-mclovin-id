@@ -4,11 +4,13 @@ import McLovinCanvas from '@/components/McLovinCanvas.astro'
 import Select from '@/components/ui/Select.astro'
 
 import { genresOptions } from '@/const/genres'
+import TakePhoto from '@/components/TakePhoto.astro'
 ---
 
 <section class="flex gap-4 my-8">
   <McLovinCanvas />
   <form id="form" class="w-full">
+    <TakePhoto />
     <Input id="name" label="Name" class="mb-5" />
     <div class="flex gap-3">
       <Input id="dob" type="date" label="DOB" class="flex-auto" />

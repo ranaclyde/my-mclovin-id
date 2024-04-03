@@ -1,0 +1,151 @@
+---
+import Input from '@/components/ui/Input.astro'
+import IconButton from './ui/IconButton.astro'
+import Check from '@/icons/check.astro'
+import Reload from '@/icons/reload.astro'
+import Close from '@/icons/close.astro'
+import ArrowFoward from '@/icons/arrowFoward.astro'
+---
+
+<Input
+  id="upload"
+  type="file"
+  label="Upload your photo"
+  class="mb-5"
+  accept="image/png, image/jpeg, image/webp"
+/>
+
+<!-- Main modal -->
+<div
+  id="default-modal"
+  tabindex="-1"
+  aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
+>
+  <div class="relative w-full max-w-md max-h-full">
+    <!-- Modal content -->
+    <div class="relative rounded-lg shadow bg-gray-700">
+      <!-- Modal header -->
+      <div
+        class="flex items-start justify-between p-4 border-b rounded-t border-gray-600"
+      >
+        <h3 class="text-xl font-semibold text-white">Upload and Crop image</h3>
+        <button
+          type="button"
+          class="text-gray-400 bg-transparent rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center hover:bg-gray-600 hover:text-white"
+          data-modal-hide="default-modal"
+        >
+          <Close />
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="p-6 space-y-6">
+        <div class="text-white h-60">
+          <div id="croppieContainer"></div>
+          <img
+            class="mx-auto"
+            alt="croppedImage"
+            id="croppedImage"
+            height="208"
+            width="170"
+          />
+        </div>
+        <div class="flex items-center justify-center gap-2">
+          <IconButton id="btnCrop">
+            <Check class="w-4 h-4" />
+          </IconButton>
+          <IconButton id="resetCrop">
+            <Reload class="w-4 h-4" />
+          </IconButton>
+          <IconButton id="next">
+            <ArrowFoward class="w-4 h-4" />
+          </IconButton>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import Croppie from 'croppie'
+  import { Modal } from 'flowbite'
+
+  // Modal
+  // select the two elements that we'll work with
+  const $modalElement: HTMLElement | null =
+    document.querySelector('#default-modal')
+
+  // create a new modal component
+  const modal = new Modal($modalElement)
+
+  // Declare variables
+  const upload = document.querySelector('#upload') as HTMLInputElement
+  const imgContainer = document.querySelector(
+    '#croppieContainer'
+  ) as HTMLElement
+  const croppedImage = document.querySelector(
+    '#croppedImage'
+  ) as HTMLImageElement
+  const cropButton = document.querySelector('#btnCrop') as HTMLButtonElement
+  const resetCropButton = document.querySelector(
+    '#resetCrop'
+  ) as HTMLButtonElement
+  const nextButton = document.querySelector('#next') as HTMLButtonElement
+
+  croppedImage.style.display = 'none'
+  resetCropButton.style.display = 'none'
+
+  // Initialize Cropie
+  const croppieInstance = new Croppie(imgContainer, {
+    viewport: { width: 170.6, height: 208.3, type: 'square' },
+    boundary: { width: 210, height: 200 },
+    enabledResize: true,
+  })
+
+  upload?.addEventListener('change', (e) => {
+    modal.show()
+    const target = e.target as HTMLInputElement
+    const file: File = (target.files as FileList)[0]
+    const render = new FileReader()
+    render.onload = (event) => {
+      croppieInstance.bind({
+        url: event.target?.result,
+      })
+    }
+    render.readAsDataURL(file)
+  })
+
+  // Event close modal
+  modal.updateOnHide(() => {
+    if (!croppedImage.src) {
+      upload.value = ''
+    }
+  })
+
+  nextButton?.addEventListener('click', () => modal.hide())
+
+  // Handle crop button click
+  cropButton?.addEventListener('click', () => {
+    croppieInstance.result('canvas').then((result: string) => {
+      // Show Cropped Image
+      croppedImage.src = result
+      croppedImage.style.display = 'block'
+      resetCropButton.style.display = 'block'
+
+      cropButton.style.display = 'none'
+      imgContainer.style.display = 'none'
+    })
+  })
+
+  resetCropButton?.addEventListener('click', () => {
+    croppedImage.style.display = 'none'
+    resetCropButton.style.display = 'none'
+    imgContainer.style.display = 'block'
+    cropButton.style.display = 'block'
+  })
+</script>
+
+<style is:global>
+  @import url('croppie/croppie.css');
+</style>
