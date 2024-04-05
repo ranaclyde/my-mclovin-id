@@ -54,8 +54,13 @@
   const dob = document.querySelector('#dob') as HTMLInputElement
   const sex = document.querySelector('#sex') as HTMLSelectElement
   const photo = document.querySelector('#croppedImage') as HTMLImageElement
+  const signImage = document.querySelector('#signImage') as HTMLImageElement
 
   photo?.addEventListener('load', () => {
+    drawCanvas()
+  })
+
+  signImage?.addEventListener('load', () => {
     drawCanvas()
   })
 
@@ -74,7 +79,7 @@
     )
     // Draw McLovin sign
     ctx.drawImage(
-      $mcLovinSign,
+      !!signImage?.src ? signImage : $mcLovinSign,
       mclovin.sign.posX / 3,
       mclovin.sign.posY / 3,
       $mcLovinSign.width / 4,

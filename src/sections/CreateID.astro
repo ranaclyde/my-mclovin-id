@@ -5,6 +5,7 @@ import Select from '@/components/ui/Select.astro'
 
 import { genresOptions } from '@/const/genres'
 import TakePhoto from '@/components/TakePhoto.astro'
+import Sign from '@/components/Sign.astro'
 ---
 
 <section class="flex gap-4 my-8">
@@ -12,9 +13,10 @@ import TakePhoto from '@/components/TakePhoto.astro'
   <form id="form" class="w-full">
     <TakePhoto />
     <Input id="name" label="Name" class="mb-5" />
-    <div class="flex gap-3">
+    <div class="flex gap-3 mb-5">
       <Input id="dob" type="date" label="DOB" class="flex-auto" />
       <Select id="sex" label="Genre" options={genresOptions} />
     </div>
+    <Sign />
   </form>
 </section>
