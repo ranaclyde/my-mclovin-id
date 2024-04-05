@@ -17,14 +17,14 @@
 </div>
 
 <script>
-  const canvas = document.querySelector('#drawSignCanvas') as HTMLCanvasElement
-  const ctx = canvas.getContext('2d')!
+  import { $ } from '@/utils/domSelector'
 
-  const signButton = document.querySelector('#sign') as HTMLButtonElement
-  const signClearButton = document.querySelector(
-    '#signClear'
-  ) as HTMLButtonElement
-  const signImage = document.querySelector('#signImage') as HTMLImageElement
+  const $canvas = $<HTMLCanvasElement>('#drawSignCanvas') as HTMLCanvasElement
+  const ctx = $canvas.getContext('2d')!
+
+  const $signButton = $<HTMLButtonElement>('#sign')
+  const $signClearButton = $<HTMLButtonElement>('#signClear')
+  const $signImage = $<HTMLImageElement>('#signImage')
 
   // Variables
   let paint = false
@@ -40,7 +40,7 @@
 
   // Functions
   function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.clearRect(0, 0, $canvas.width, $canvas.height)
     clickX = []
     clickY = []
     clickDrag = []
@@ -69,7 +69,7 @@
 
   const clearEventHandler = () => {
     clearCanvas()
-    signImage.src = ''
+    $signImage.src = ''
   }
 
   const releaseEventHandler = () => {
@@ -88,8 +88,8 @@
     let mouseY = (e as TouchEvent).changedTouches
       ? (e as TouchEvent).changedTouches[0].pageY
       : (e as MouseEvent).pageY
-    mouseX -= canvas.offsetLeft
-    mouseY -= canvas.offsetTop
+    mouseX -= $canvas.offsetLeft
+    mouseY -= $canvas.offsetTop
 
     paint = true
     addClick(mouseX, mouseY, false)
@@ -103,8 +103,8 @@
     let mouseY = (e as TouchEvent).changedTouches
       ? (e as TouchEvent).changedTouches[0].pageY
       : (e as MouseEvent).pageY
-    mouseX -= canvas.offsetLeft
-    mouseY -= canvas.offsetTop
+    mouseX -= $canvas.offsetLeft
+    mouseY -= $canvas.offsetTop
 
     if (paint) {
       addClick(mouseX, mouseY, true)
@@ -115,19 +115,19 @@
   }
 
   // EventListeners
-  canvas.addEventListener('mousedown', pressEventHandler)
-  canvas.addEventListener('mousemove', dragEventHandler)
-  canvas.addEventListener('mouseup', releaseEventHandler)
-  canvas.addEventListener('mouseout', cancelEventHandler)
+  $canvas.addEventListener('mousedown', pressEventHandler)
+  $canvas.addEventListener('mousemove', dragEventHandler)
+  $canvas.addEventListener('mouseup', releaseEventHandler)
+  $canvas.addEventListener('mouseout', cancelEventHandler)
 
-  canvas.addEventListener('touchstart', pressEventHandler)
-  canvas.addEventListener('touchmove', dragEventHandler)
-  canvas.addEventListener('touchend', releaseEventHandler)
-  canvas.addEventListener('touchcancel', cancelEventHandler)
+  $canvas.addEventListener('touchstart', pressEventHandler)
+  $canvas.addEventListener('touchmove', dragEventHandler)
+  $canvas.addEventListener('touchend', releaseEventHandler)
+  $canvas.addEventListener('touchcancel', cancelEventHandler)
 
-  signClearButton.addEventListener('click', clearEventHandler)
+  $signClearButton.addEventListener('click', clearEventHandler)
 
-  signButton.addEventListener('click', () => {
-    signImage.src = canvas.toDataURL()
+  $signButton.addEventListener('click', () => {
+    $signImage.src = $canvas.toDataURL()
   })
 </script>
