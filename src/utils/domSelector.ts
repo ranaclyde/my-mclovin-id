@@ -1,5 +1,5 @@
 // Get element from dom by selector string
-export const $ = <T>(
+export const $ = <T = HTMLElement>(
   selector: string,
   context: Document | HTMLElement = document
-): T => context.querySelector(selector) as T
+) => context.querySelector(selector) as T

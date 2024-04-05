@@ -70,40 +70,32 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
 <script>
   import Croppie from 'croppie'
   import { Modal } from 'flowbite'
+  import { $ } from '@/utils/domSelector'
 
   // Modal
   // select the two elements that we'll work with
-  const $modalElement: HTMLElement | null =
-    document.querySelector('#cropImgModal')
-
-  // create a new modal component
+  const $modalElement = $('#cropImgModal')
   const modal = new Modal($modalElement)
 
   // Declare variables
-  const upload = document.querySelector('#upload') as HTMLInputElement
-  const imgContainer = document.querySelector(
-    '#croppieContainer'
-  ) as HTMLElement
-  const croppedImage = document.querySelector(
-    '#croppedImage'
-  ) as HTMLImageElement
-  const cropButton = document.querySelector('#btnCrop') as HTMLButtonElement
-  const resetCropButton = document.querySelector(
-    '#resetCrop'
-  ) as HTMLButtonElement
-  const nextButton = document.querySelector('#next') as HTMLButtonElement
+  const $upload = $<HTMLInputElement>('#upload')
+  const $imgContainer = $('#croppieContainer')
+  const $croppedImage = $<HTMLImageElement>('#croppedImage')
+  const $cropButton = $<HTMLButtonElement>('#btnCrop')
+  const $resetCropButton = $<HTMLButtonElement>('#resetCrop')
+  const $nextButton = $<HTMLButtonElement>('#next')
 
-  croppedImage.style.display = 'none'
-  resetCropButton.style.display = 'none'
+  $croppedImage.style.display = 'none'
+  $resetCropButton.style.display = 'none'
 
   // Initialize Cropie
-  const croppieInstance = new Croppie(imgContainer, {
+  const croppieInstance = new Croppie($imgContainer, {
     viewport: { width: 170.6, height: 208.3, type: 'square' },
     boundary: { width: 210, height: 200 },
     enabledResize: true,
   })
 
-  upload?.addEventListener('change', (e) => {
+  $upload?.addEventListener('change', (e) => {
     modal.show()
     const target = e.target as HTMLInputElement
     const file: File = (target.files as FileList)[0]
@@ -118,31 +110,31 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
 
   // Event close modal
   modal.updateOnHide(() => {
-    if (!croppedImage.src) {
-      upload.value = ''
+    if (!$croppedImage.src) {
+      $upload.value = ''
     }
   })
 
-  nextButton?.addEventListener('click', () => modal.hide())
+  $nextButton?.addEventListener('click', () => modal.hide())
 
   // Handle crop button click
-  cropButton?.addEventListener('click', () => {
+  $cropButton?.addEventListener('click', () => {
     croppieInstance.result('canvas').then((result: string) => {
       // Show Cropped Image
-      croppedImage.src = result
-      croppedImage.style.display = 'block'
-      resetCropButton.style.display = 'block'
+      $croppedImage.src = result
+      $croppedImage.style.display = 'block'
+      $resetCropButton.style.display = 'block'
 
-      cropButton.style.display = 'none'
-      imgContainer.style.display = 'none'
+      $cropButton.style.display = 'none'
+      $imgContainer.style.display = 'none'
     })
   })
 
-  resetCropButton?.addEventListener('click', () => {
-    croppedImage.style.display = 'none'
-    resetCropButton.style.display = 'none'
-    imgContainer.style.display = 'block'
-    cropButton.style.display = 'block'
+  $resetCropButton?.addEventListener('click', () => {
+    $croppedImage.style.display = 'none'
+    $resetCropButton.style.display = 'none'
+    $imgContainer.style.display = 'block'
+    $cropButton.style.display = 'block'
   })
 </script>
 
