@@ -17,7 +17,7 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
 
 <!-- Main modal -->
 <div
-  id="default-modal"
+  id="cropImgModal"
   tabindex="-1"
   aria-hidden="true"
   class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
@@ -33,7 +33,7 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
         <button
           type="button"
           class="text-gray-400 bg-transparent rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center hover:bg-gray-600 hover:text-white"
-          data-modal-hide="default-modal"
+          data-modal-hide="cropImgModal"
         >
           <Close />
           <span class="sr-only">Close modal</span>
@@ -74,7 +74,7 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
   // Modal
   // select the two elements that we'll work with
   const $modalElement: HTMLElement | null =
-    document.querySelector('#default-modal')
+    document.querySelector('#cropImgModal')
 
   // create a new modal component
   const modal = new Modal($modalElement)
