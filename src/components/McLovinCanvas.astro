@@ -34,44 +34,40 @@
 <script>
   import { mclovin, fontSize } from '@/const/mclovinData'
   import { formattedDate } from '@/utils/formattedDate'
+  import { $ } from '@/utils/domSelector'
 
-  const canvas = document.querySelector('#mclovin-canvas') as HTMLCanvasElement
-  const ctx = canvas.getContext('2d')!
+  const $canvas = $<HTMLCanvasElement>('#mclovin-canvas')
+  const ctx = $canvas.getContext('2d')!
 
-  const $mcLovinID = document.querySelector('#mcLovinID') as HTMLImageElement
-  const $mcLovinFace = document.querySelector(
-    '#mcLovinFace'
-  ) as HTMLImageElement
-  const $mcLovinSign = document.querySelector(
-    '#mcLovinSign'
-  ) as HTMLImageElement
+  const $mcLovinID = $<HTMLImageElement>('#mcLovinID')
+  const $mcLovinFace = $<HTMLImageElement>('#mcLovinFace')
+  const $mcLovinSign = $<HTMLImageElement>('#mcLovinSign')
+  const $name = $<HTMLInputElement>('#name')
+  const $dob = $<HTMLInputElement>('#dob')
+  const $sex = $<HTMLSelectElement>('#sex')
+  const $photo = $<HTMLImageElement>('#croppedImage')
+  const $signImage = $<HTMLImageElement>('#signImage')
 
-  document.querySelector('#form')?.addEventListener('input', function () {
+  $('#form').addEventListener('input', function () {
     drawCanvas()
   })
 
-  const name = document.querySelector('#name') as HTMLInputElement
-  const dob = document.querySelector('#dob') as HTMLInputElement
-  const sex = document.querySelector('#sex') as HTMLSelectElement
-  const photo = document.querySelector('#croppedImage') as HTMLImageElement
-  const signImage = document.querySelector('#signImage') as HTMLImageElement
-
-  photo?.addEventListener('load', () => {
+  $photo?.addEventListener('load', () => {
     drawCanvas()
   })
 
-  signImage?.addEventListener('load', () => {
+  $signImage?.addEventListener('load', () => {
     drawCanvas()
   })
 
   function drawCanvas() {
     // Clean canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.clearRect(0, 0, $canvas.width, $canvas.height)
     // Draw empty ID
-    ctx.drawImage($mcLovinID, 0, 0, canvas.width, canvas.height)
+    ctx.drawImage($mcLovinID, 0, 0, $canvas.width, $canvas.height)
     // Draw McLovin photo
     ctx.drawImage(
-      !!photo?.src ? photo : $mcLovinFace,
+      !!$photo?.src ? $photo : $mcLovinFace,
       mclovin.photo.posX / 3,
       mclovin.photo.posY / 3,
       $mcLovinFace.width / 3,
@@ -79,7 +75,7 @@
     )
     // Draw McLovin sign
     ctx.drawImage(
-      !!signImage?.src ? signImage : $mcLovinSign,
+      !!$signImage?.src ? $signImage : $mcLovinSign,
       mclovin.sign.posX / 3,
       mclovin.sign.posY / 3,
       $mcLovinSign.width / 4,
@@ -89,7 +85,7 @@
     ctx.font = `bold ${fontSize.title / 3}px Arial`
     // DOB
     ctx.fillText(
-      formattedDate(dob?.value) || mclovin.dob.value,
+      formattedDate($dob?.value) || mclovin.dob.value,
       mclovin.dob.posX / 3,
       mclovin.dob.posY / 3
     )
@@ -101,7 +97,7 @@
     )
     // NAME
     ctx.fillText(
-      name?.value || mclovin.name.value,
+      $name?.value || mclovin.name.value,
       mclovin.name.posX / 3,
       mclovin.name.posY / 3
     )
@@ -109,7 +105,7 @@
     ctx.font = `bold ${fontSize.subtitle / 3}px Arial`
     // SEX
     ctx.fillText(
-      sex?.value || mclovin.sex.value,
+      $sex?.value || mclovin.sex.value,
       mclovin.sex.posX / 3,
       mclovin.sex.posY / 3
     )
@@ -122,8 +118,8 @@
   }
 
   function updateExpDate() {
-    if (!dob.value) return
-    const dobDate = formattedDate(dob.value)
+    if (!$dob.value) return
+    const dobDate = formattedDate($dob.value)
     const extractDate = dobDate?.split('/')
     if (!extractDate) return
     const year = new Date().getFullYear() + 10
