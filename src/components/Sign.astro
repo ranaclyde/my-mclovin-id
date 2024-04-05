@@ -82,14 +82,7 @@
   }
 
   const pressEventHandler = (e: MouseEvent | TouchEvent) => {
-    let mouseX = (e as TouchEvent).changedTouches
-      ? (e as TouchEvent).changedTouches[0].pageX
-      : (e as MouseEvent).pageX
-    let mouseY = (e as TouchEvent).changedTouches
-      ? (e as TouchEvent).changedTouches[0].pageY
-      : (e as MouseEvent).pageY
-    mouseX -= $canvas.offsetLeft
-    mouseY -= $canvas.offsetTop
+    const { mouseX, mouseY } = mouseAndTouchsEvents(e)
 
     paint = true
     addClick(mouseX, mouseY, false)
@@ -97,6 +90,17 @@
   }
 
   const dragEventHandler = (e: MouseEvent | TouchEvent) => {
+    const { mouseX, mouseY } = mouseAndTouchsEvents(e)
+
+    if (paint) {
+      addClick(mouseX, mouseY, true)
+      redraw()
+    }
+
+    e.preventDefault()
+  }
+
+  const mouseAndTouchsEvents = (e: MouseEvent | TouchEvent) => {
     let mouseX = (e as TouchEvent).changedTouches
       ? (e as TouchEvent).changedTouches[0].pageX
       : (e as MouseEvent).pageX
@@ -106,12 +110,7 @@
     mouseX -= $canvas.offsetLeft
     mouseY -= $canvas.offsetTop
 
-    if (paint) {
-      addClick(mouseX, mouseY, true)
-      redraw()
-    }
-
-    e.preventDefault()
+    return { mouseX, mouseY }
   }
 
   // EventListeners
