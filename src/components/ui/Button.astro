@@ -1,0 +1,74 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+interface Props extends Omit<HTMLAttributes<'button'>, 'disabled'> {
+  id?: string
+  type?: 'button' | 'submit'
+  isDisabled?: boolean
+  class?: string
+  color?: keyof typeof colorClasses
+  size?: keyof typeof sizeClasses
+  variant?: 'default' | 'outlined'
+  shape?: keyof typeof shapeClasses
+  isOnlyIcon?: boolean
+}
+
+const {
+  type = 'button',
+  color = 'purple',
+  size = 'medium',
+  variant = 'default',
+  shape = 'default',
+  isDisabled = false,
+  isOnlyIcon = false,
+  class: className,
+  ...otherProps
+} = Astro.props
+
+const colorClasses = {
+  purple: {
+    default: [
+      'text-white',
+      'bg-purple-600',
+      'hover:bg-purple-700',
+      'focus:ring-purple-800',
+      'disabled:bg-purple-600 disabled:opacity-40',
+    ],
+    outlined: [
+      'text-purple-400',
+      'border border-purple-400',
+      'hover:text-white hover:bg-purple-500',
+      'focus:ring-purple-900',
+      'disabled:disabled:bg-transparent disabled:text-purple-400 disabled:opacity-40',
+    ],
+  },
+}
+
+const shapeClasses = {
+  default: 'rounded-lg',
+  pill: 'rounded-full',
+  square: 'rounded-none',
+}
+
+const sizeClasses = {
+  small: [!isOnlyIcon ? 'px-3 py-2' : 'p-2', 'text-sm'],
+  medium: [!isOnlyIcon ? 'px-5 py-2.5' : 'p-2.5', 'text-sm'],
+  large: [!isOnlyIcon ? 'px-5 py-3' : 'p-3', 'text-base'],
+}
+
+const classes = [
+  colorClasses[color][variant],
+  sizeClasses[size],
+  shapeClasses[shape],
+  className,
+]
+---
+
+<button
+  class:list={classes}
+  type={type}
+  class="w-full sm:w-auto inline-flex items-center text-center font-medium focus:ring-4 focus:outline-none disabled:cursor-not-allowed disabled:shadow-none"
+  disabled={isDisabled}
+  {...otherProps}
+>
+  <slot>Button</slot>
+</button>
