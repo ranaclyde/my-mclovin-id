@@ -1,3 +1,9 @@
+---
+import Button from '@/components/ui/Button.astro'
+import Check from '@/icons/check.astro'
+import Reload from '@/icons/reload.astro'
+---
+
 <div>
   <span class="block mb-2 text-sm font-medium text-white"> Signature </span>
   <div class="flex gap-2">
@@ -7,11 +13,19 @@
       width="auto"
       height="120"></canvas>
     <img hidden alt="McLovin Sign" id="signImage" height="120" width="auto" />
-    <div class="flex flex-col">
-      <button type="button" id="sign" class="text-purple-600">Sign</button>
-      <button type="button" id="signClear" class="text-purple-600">
-        Clear
-      </button>
+    <div class="flex flex-col gap-1">
+      <Button id="sign" size="sm" shape="pill" isOnlyIcon desc="Sign">
+        <Check />
+      </Button>
+      <Button
+        id="signClear"
+        size="sm"
+        shape="pill"
+        isOnlyIcon
+        desc="Reload Sign"
+      >
+        <Reload />
+      </Button>
     </div>
   </div>
 </div>
