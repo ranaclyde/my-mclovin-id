@@ -1,5 +1,6 @@
 ---
 import type { HTMLAttributes } from 'astro/types'
+
 interface Props extends Omit<HTMLAttributes<'button'>, 'disabled'> {
   id?: string
   type?: 'button' | 'submit'
@@ -10,17 +11,19 @@ interface Props extends Omit<HTMLAttributes<'button'>, 'disabled'> {
   variant?: 'default' | 'outlined'
   shape?: keyof typeof shapeClasses
   isOnlyIcon?: boolean
+  desc?: string
 }
 
 const {
   type = 'button',
   color = 'purple',
-  size = 'medium',
+  size = 'md',
   variant = 'default',
   shape = 'default',
   isDisabled = false,
   isOnlyIcon = false,
   class: className,
+  desc = 'Icon Button description',
   ...otherProps
 } = Astro.props
 
@@ -50,9 +53,9 @@ const shapeClasses = {
 }
 
 const sizeClasses = {
-  small: [!isOnlyIcon ? 'px-3 py-2' : 'p-2', 'text-sm'],
-  medium: [!isOnlyIcon ? 'px-5 py-2.5' : 'p-2.5', 'text-sm'],
-  large: [!isOnlyIcon ? 'px-5 py-3' : 'p-3', 'text-base'],
+  sm: [!isOnlyIcon ? 'px-3 py-2' : 'p-2', 'text-sm'],
+  md: [!isOnlyIcon ? 'px-5 py-2.5' : 'p-2.5', 'text-sm'],
+  lg: [!isOnlyIcon ? 'px-5 py-3' : 'p-3', 'text-base'],
 }
 
 const classes = [
@@ -71,4 +74,5 @@ const classes = [
   {...otherProps}
 >
   <slot>Button</slot>
+  {isOnlyIcon && <span class="sr-only">{desc}</span>}
 </button>

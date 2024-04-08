@@ -1,6 +1,6 @@
 ---
 import Input from '@/components/ui/Input.astro'
-import IconButton from './ui/IconButton.astro'
+import Button from '@/components/ui/Button.astro'
 import Check from '@/icons/check.astro'
 import Reload from '@/icons/reload.astro'
 import Close from '@/icons/close.astro'
@@ -52,15 +52,15 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
           />
         </div>
         <div class="flex items-center justify-center gap-2">
-          <IconButton id="btnCrop">
+          <Button id="btnCrop" isOnlyIcon>
             <Check class="w-4 h-4" />
-          </IconButton>
-          <IconButton id="resetCrop">
+          </Button>
+          <Button id="resetCrop" isOnlyIcon>
             <Reload class="w-4 h-4" />
-          </IconButton>
-          <IconButton id="next">
+          </Button>
+          <Button id="next" isOnlyIcon>
             <ArrowFoward class="w-4 h-4" />
-          </IconButton>
+          </Button>
         </div>
       </div>
     </div>
