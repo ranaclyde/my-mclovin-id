@@ -19,6 +19,7 @@
     "typescript": "5.4.3"
   },
   "devDependencies": {
-    "@types/croppie": "^2.6.4"
+    "@types/croppie": "^2.6.4",
+    "tailwind-merge": "^2.2.2"
   }
 }

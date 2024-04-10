@@ -1,5 +1,6 @@
 ---
 import type { HTMLAttributes } from 'astro/types'
+import { twMerge } from 'tailwind-merge'
 
 interface Props extends Omit<HTMLAttributes<'button'>, 'disabled'> {
   id?: string
@@ -128,8 +129,8 @@ const sizeClasses = {
 }
 
 const initClasses = [
-  'w-full sm:w-auto font-semibold',
-  'inline-flex items-center gap-1',
+  'font-semibold',
+  'inline-flex items-center justify-center gap-1',
   'text-center font-semibold',
   'focus:ring-4 focus:outline-none',
   'disabled:cursor-not-allowed disabled:shadow-none',
@@ -139,12 +140,16 @@ const classes = [
   variantClasses[color][variant],
   sizeClasses[size],
   shapeClasses[shape],
-  initClasses,
   className,
 ]
 ---
 
-<button class:list={classes} type={type} disabled={isDisabled} {...otherProps}>
+<button
+  class:list={twMerge(...initClasses, ...classes)}
+  type={type}
+  disabled={isDisabled}
+  {...otherProps}
+>
   <slot>Button</slot>
   {isOnlyIcon && <span class="sr-only">{desc}</span>}
 </button>
