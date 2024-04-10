@@ -14,15 +14,23 @@ import Reload from '@/icons/reload.astro'
       height="120"></canvas>
     <img hidden alt="McLovin Sign" id="signImage" height="120" width="auto" />
     <div class="flex flex-col gap-1">
-      <Button id="sign" size="sm" shape="pill" isOnlyIcon desc="Sign">
+      <Button
+        id="sign"
+        size="xs"
+        shape="pill"
+        color="success"
+        desc="Sign"
+        isOnlyIcon
+      >
         <Check />
       </Button>
       <Button
         id="signClear"
-        size="sm"
+        size="xs"
         shape="pill"
-        isOnlyIcon
+        color="info"
         desc="Reload Sign"
+        isOnlyIcon
       >
         <Reload />
       </Button>

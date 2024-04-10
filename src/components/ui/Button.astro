@@ -6,9 +6,9 @@ interface Props extends Omit<HTMLAttributes<'button'>, 'disabled'> {
   type?: 'button' | 'submit'
   isDisabled?: boolean
   class?: string
-  color?: keyof typeof colorClasses
+  color?: keyof typeof variantClasses
   size?: keyof typeof sizeClasses
-  variant?: 'default' | 'outlined'
+  variant?: 'default' | 'ghost' | 'link' | 'outlined'
   shape?: keyof typeof shapeClasses
   isOnlyIcon?: boolean
   desc?: string
@@ -16,7 +16,7 @@ interface Props extends Omit<HTMLAttributes<'button'>, 'disabled'> {
 
 const {
   type = 'button',
-  color = 'purple',
+  color = 'primary',
   size = 'md',
   variant = 'default',
   shape = 'default',
@@ -27,8 +27,8 @@ const {
   ...otherProps
 } = Astro.props
 
-const colorClasses = {
-  purple: {
+const variantClasses = {
+  primary: {
     default: [
       'text-white',
       'bg-purple-600',
@@ -43,6 +43,74 @@ const colorClasses = {
       'focus:ring-purple-900',
       'disabled:disabled:bg-transparent disabled:text-purple-400 disabled:opacity-40',
     ],
+    ghost: [
+      'text-purple-600',
+      'hover:bg-purple-700 hover:bg-opacity-10',
+      'focus:ring-purple-800',
+      'disabled:disabled:bg-transparent disabled:text-purple-400 disabled:opacity-40',
+    ],
+    link: [
+      'text-purple-600',
+      'hover:underline hover:underline-offset-2',
+      'focus:ring-purple-800',
+      'disabled:disabled:bg-transparent disabled:text-purple-400 disabled:opacity-40',
+    ],
+  },
+  success: {
+    default: [
+      'text-white',
+      'bg-green-600',
+      'hover:bg-green-700',
+      'focus:ring-green-800',
+      'disabled:bg-green-600 disabled:opacity-40',
+    ],
+    outlined: [
+      'text-green-400',
+      'border border-green-400',
+      'hover:text-white hover:bg-green-500',
+      'focus:ring-green-900',
+      'disabled:disabled:bg-transparent disabled:text-green-400 disabled:opacity-40',
+    ],
+    ghost: [
+      'text-green-600',
+      'hover:bg-green-700 hover:bg-opacity-10',
+      'focus:ring-green-800',
+      'disabled:disabled:bg-transparent disabled:text-green-400 disabled:opacity-40',
+    ],
+    link: [
+      'text-green-600',
+      'hover:underline hover:underline-offset-2',
+      'focus:ring-green-800',
+      'disabled:disabled:bg-transparent disabled:text-green-400 disabled:opacity-40',
+    ],
+  },
+  info: {
+    default: [
+      'text-white',
+      'bg-blue-600',
+      'hover:bg-blue-700',
+      'focus:ring-blue-800',
+      'disabled:bg-blue-600 disabled:opacity-40',
+    ],
+    outlined: [
+      'text-blue-400',
+      'border border-blue-400',
+      'hover:text-white hover:bg-blue-500',
+      'focus:ring-blue-900',
+      'disabled:disabled:bg-transparent disabled:text-blue-400 disabled:opacity-40',
+    ],
+    ghost: [
+      'text-blue-600',
+      'hover:bg-blue-700 hover:bg-opacity-10',
+      'focus:ring-blue-800',
+      'disabled:disabled:bg-transparent disabled:text-blue-400 disabled:opacity-40',
+    ],
+    link: [
+      'text-blue-600',
+      'hover:underline hover:underline-offset-2',
+      'focus:ring-blue-800',
+      'disabled:disabled:bg-transparent disabled:text-blue-400 disabled:opacity-40',
+    ],
   },
 }
 
@@ -53,26 +121,30 @@ const shapeClasses = {
 }
 
 const sizeClasses = {
+  xs: [!isOnlyIcon ? 'px-2 py-1' : 'p-1', 'text-xs'],
   sm: [!isOnlyIcon ? 'px-3 py-2' : 'p-2', 'text-sm'],
   md: [!isOnlyIcon ? 'px-5 py-2.5' : 'p-2.5', 'text-sm'],
   lg: [!isOnlyIcon ? 'px-5 py-3' : 'p-3', 'text-base'],
 }
 
+const initClasses = [
+  'w-full sm:w-auto font-semibold',
+  'inline-flex items-center gap-1',
+  'text-center font-semibold',
+  'focus:ring-4 focus:outline-none',
+  'disabled:cursor-not-allowed disabled:shadow-none',
+]
+
 const classes = [
-  colorClasses[color][variant],
+  variantClasses[color][variant],
   sizeClasses[size],
   shapeClasses[shape],
+  initClasses,
   className,
 ]
 ---
 
-<button
-  class:list={classes}
-  type={type}
-  class="w-full sm:w-auto inline-flex items-center text-center font-medium focus:ring-4 focus:outline-none disabled:cursor-not-allowed disabled:shadow-none"
-  disabled={isDisabled}
-  {...otherProps}
->
+<button class:list={classes} type={type} disabled={isDisabled} {...otherProps}>
   <slot>Button</slot>
   {isOnlyIcon && <span class="sr-only">{desc}</span>}
 </button>
