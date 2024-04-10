@@ -74,12 +74,13 @@
       $mcLovinFace.height / 3
     )
     // Draw McLovin sign
+    const signSize = !!$signImage?.src ? 3 : 4
     ctx.drawImage(
       !!$signImage?.src ? $signImage : $mcLovinSign,
       mclovin.sign.posX / 3,
       mclovin.sign.posY / 3,
-      $mcLovinSign.width / 4,
-      $mcLovinSign.height / 4
+      $mcLovinSign.width / signSize,
+      $mcLovinSign.height / signSize
     )
 
     ctx.font = `bold ${fontSize.title / 3}px Arial`
