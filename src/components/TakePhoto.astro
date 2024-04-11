@@ -96,9 +96,16 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
   })
 
   $upload?.addEventListener('change', (e) => {
-    modal.show()
+    const allowedExtensions = new Array('image/png', 'image/jpeg', 'image/webp')
     const target = e.target as HTMLInputElement
     const file: File = (target.files as FileList)[0]
+
+    if (!allowedExtensions.includes(file.type)) {
+      // TODO: Return toast error
+      return
+    }
+
+    modal.show()
     const render = new FileReader()
     render.onload = (event) => {
       croppieInstance.bind({
