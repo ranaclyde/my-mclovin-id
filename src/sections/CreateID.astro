@@ -6,17 +6,53 @@ import Select from '@/components/ui/Select.astro'
 import { genresOptions } from '@/const/genres'
 import TakePhoto from '@/components/TakePhoto.astro'
 import Sign from '@/components/Sign.astro'
+import Button from '@/components/ui/Button.astro'
 ---
 
-<section class="flex gap-4 my-8">
-  <McLovinCanvas />
-  <form id="form" class="w-full">
-    <TakePhoto />
-    <Input id="name" label="Name" class="mb-5" />
-    <div class="flex gap-3 mb-5">
-      <Input id="dob" type="date" label="DOB" class="flex-auto" />
-      <Select id="sex" label="Genre" options={genresOptions} />
+<section class="mt-14">
+  <div class="flex gap-4 mb-8">
+    <div>
+      <div>
+        <h1 class="text-xl text-white font-bold">
+          Creates Fogell's fake credential
+        </h1>
+        <h2 class="text-md text-gray-300 mb-10">
+          Create the fake ID of the popular character from the movie SuperBad
+        </h2>
+      </div>
+      <McLovinCanvas />
     </div>
-    <Sign />
-  </form>
+    <form id="form" class="w-full">
+      <Input id="name" label="Name" class="mb-5" maxlength="15" />
+      <div class="flex gap-3 mb-5">
+        <Input id="dob" type="date" label="DOB" class="flex-auto" />
+        <Select id="sex" label="Genre" options={genresOptions} />
+      </div>
+      <TakePhoto />
+      <Sign />
+    </form>
+  </div>
+  <div class="text-center">
+    <Button id="exportCanvas" size="lg">Exportar ID</Button>
+  </div>
 </section>
+
+<script>
+  import { $ } from '@/utils/domSelector'
+
+  const $canvas = $<HTMLCanvasElement>('#mclovin-canvas')
+  const $exportCanvasButton = $<HTMLButtonElement>('#exportCanvas')
+
+  $exportCanvasButton.onclick = () => {
+    $exportCanvasButton.disabled = true
+    //Descargar el contenido del canvas
+    let downloadLink = document.createElement('a')
+    downloadLink.href = $canvas.toDataURL() // Convertir el contenido del canvas a una URL de datos
+    downloadLink.download = 'my-mclovin-id.png' // Nombre del archivo de descarga
+    downloadLink.click() // Simular el clic en el enlace de descarga
+
+    setTimeout(() => {
+      $exportCanvasButton.disabled = false
+    }, 1000)
+  }
+</script>
