@@ -13,13 +13,13 @@ const { title } = Astro.props
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="Crea tu propio ID falso de McLovin de la película Superbad. Personaliza nombre, fecha de nacimiento, foto y firma." />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/webp" href="/favicon.webp" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="bg-gray-800">
+  <body class="bg-hawaii-navy">
     <Navbar />
     <slot />
     <Footer />
@@ -28,6 +28,10 @@ const { title } = Astro.props
 
 <style is:global>
   @import 'butterup-toast/dist/butterup.css';
+
+  html {
+    scroll-behavior: smooth;
+  }
 
   .butteruptoast.dark {
     font-size: 21px;
