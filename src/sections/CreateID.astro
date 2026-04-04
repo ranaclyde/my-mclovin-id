@@ -7,6 +7,7 @@ import { genresOptions } from '@/const/genres'
 import TakePhoto from '@/components/TakePhoto.astro'
 import Sign from '@/components/Sign.astro'
 import Button from '@/components/ui/Button.astro'
+import Download from '@/icons/download.astro'
 ---
 
 <section class="mt-14">
@@ -33,23 +34,44 @@ import Button from '@/components/ui/Button.astro'
     </form>
   </div>
   <div class="text-center">
-    <Button id="exportCanvas" size="lg">Exportar ID</Button>
+    <Button id="exportCanvas" size="lg" class="min-w-48">
+      Export ID
+      <Download />
+    </Button>
   </div>
 </section>
 
 <script>
   import { $ } from '@/utils/domSelector'
+  import { butterup } from 'butterup-toast'
+
+  butterup.toast({
+    title: 'Error al guardar el voto',
+    message: 'fallo la cosa',
+    location: 'bottom-center',
+    type: 'error',
+    icon: true,
+    theme: 'dark'
+  })
+  butterup.toast({
+    title: 'Error al guardar el voto',
+    message: 'fallo la cosa',
+    location: 'bottom-center',
+    type: 'success',
+    icon: true,
+    theme: 'glass2'
+  })
 
   const $canvas = $<HTMLCanvasElement>('#mclovin-canvas')
   const $exportCanvasButton = $<HTMLButtonElement>('#exportCanvas')
 
   $exportCanvasButton.onclick = () => {
     $exportCanvasButton.disabled = true
-    //Descargar el contenido del canvas
+
     let downloadLink = document.createElement('a')
-    downloadLink.href = $canvas.toDataURL() // Convertir el contenido del canvas a una URL de datos
-    downloadLink.download = 'my-mclovin-id.png' // Nombre del archivo de descarga
-    downloadLink.click() // Simular el clic en el enlace de descarga
+    downloadLink.href = $canvas.toDataURL()
+    downloadLink.download = 'my-mclovin-id.png'
+    downloadLink.click()
 
     setTimeout(() => {
       $exportCanvasButton.disabled = false
