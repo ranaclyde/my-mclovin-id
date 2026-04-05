@@ -31,18 +31,7 @@ import Download from '@/icons/download.astro'
 
       <!-- Canvas / Preview column -->
       <div class="w-full md:w-auto flex flex-col items-center gap-4">
-        <!-- Mobile static preview -->
-        <div class="block md:hidden w-full">
-          <img
-            src="/images/mclovin-empty-id.webp"
-            alt="Preview del ID de McLovin"
-            class="w-full max-w-xs mx-auto rounded-lg shadow-lg border border-hawaii-steel opacity-75"
-          />
-          <p class="text-xs text-slate-500 text-center mt-2">
-            Preview interactivo disponible en desktop
-          </p>
-        </div>
-        <!-- Desktop interactive canvas -->
+        <!-- Interactive canvas -->
         <McLovinCanvas />
       </div>
 
