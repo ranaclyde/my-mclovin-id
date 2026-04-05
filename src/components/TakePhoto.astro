@@ -1,6 +1,5 @@
 ---
 import Input from '@/components/ui/Input.astro'
-import Button from '@/components/ui/Button.astro'
 import Check from '@/icons/check.astro'
 import Reload from '@/icons/reload.astro'
 import Close from '@/icons/close.astro'
@@ -10,141 +9,223 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
 <Input
   id="upload"
   type="file"
-  label="Upload your photo"
+  label="Subí tu foto"
   class="mb-5"
   accept="image/png, image/jpeg, image/webp"
+  placeholder="Seleccioná una imagen para tu ID"
 />
 
-<!-- Main modal -->
-<div
-  id="cropImgModal"
-  tabindex="-1"
-  aria-hidden="true"
-  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
->
-  <div class="relative w-full max-w-md max-h-full">
-    <!-- Modal content -->
-    <div class="relative rounded-lg shadow bg-hawaii-card border border-hawaii-steel">
-      <!-- Modal header -->
-      <div
-        class="flex items-start justify-between p-4 border-b rounded-t border-hawaii-steel"
-      >
-        <h3 class="text-xl font-semibold text-white">Upload and Crop image</h3>
-        <button
-          type="button"
-          class="text-slate-400 bg-transparent rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center hover:bg-hawaii-steel hover:text-white"
-          data-modal-hide="cropImgModal"
-        >
-          <Close />
-          <span class="sr-only">Close modal</span>
-        </button>
+<dialog id="cropImgModal" class="crop-dialog">
+  <!-- Gold accent bar -->
+  <div class="h-1 w-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 rounded-t-xl"></div>
+
+  <!-- Header -->
+  <div class="flex items-center justify-between px-5 py-4 border-b border-hawaii-steel/60">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+        <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
       </div>
-      <!-- Modal body -->
-      <div class="p-6 space-y-6">
-        <div class="text-white h-60">
-          <div id="croppieContainer"></div>
-          <img
-            class="mx-auto"
-            alt="croppedImage"
-            id="croppedImage"
-            height="208"
-            width="170"
-          />
-        </div>
-        <div class="flex items-center justify-center gap-2">
-          <Button id="btnCrop" isOnlyIcon>
-            <Check class="w-4 h-4" />
-          </Button>
-          <Button id="resetCrop" isOnlyIcon>
-            <Reload class="w-4 h-4" />
-          </Button>
-          <Button id="next" isOnlyIcon>
-            <ArrowFoward class="w-4 h-4" />
-          </Button>
-        </div>
+      <div>
+        <h3 id="modalTitle" class="text-base font-bold text-white">Recortá tu foto</h3>
+        <p id="modalSubtitle" class="text-xs text-slate-400">Ajustá el encuadre para tu ID</p>
       </div>
     </div>
+    <button
+      id="closeModal"
+      type="button"
+      class="w-8 h-8 rounded-lg inline-flex items-center justify-center text-slate-500 hover:bg-hawaii-steel/60 hover:text-white transition-colors"
+    >
+      <Close />
+      <span class="sr-only">Cerrar</span>
+    </button>
   </div>
-</div>
+
+  <!-- Body -->
+  <div class="px-5 py-5 space-y-4">
+
+    <!-- Croppie -->
+    <div id="cropView">
+      <div id="croppieContainer"></div>
+      <p class="text-xs text-slate-500 text-center mt-2">Arrastrá y hacé zoom para ajustar</p>
+    </div>
+
+    <!-- Preview (oculto hasta que se recorta) -->
+    <div id="previewView" class="hidden flex-col items-center gap-3">
+      <img
+        id="croppedImage"
+        alt="Imagen recortada"
+        width="170"
+        height="208"
+        class="rounded-lg border-2 border-amber-500/50 block"
+      />
+      <p class="text-xs text-slate-400">¿Quedó bien? Usá esta foto o recortá de nuevo</p>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex gap-3">
+      <button
+        id="btnCrop"
+        type="button"
+        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-hawaii-navy font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+      >
+        <Check class="w-4 h-4" />
+        Recortar foto
+      </button>
+
+      <button
+        id="resetCrop"
+        type="button"
+        class="hidden flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-hawaii-steel hover:border-amber-500/40 hover:bg-hawaii-steel/40 text-slate-300 hover:text-white font-medium text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+      >
+        <Reload class="w-4 h-4" />
+        Recortar de nuevo
+      </button>
+
+      <button
+        id="next"
+        type="button"
+        class="hidden flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-hawaii-navy font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+      >
+        Usar esta foto
+        <ArrowFoward class="w-4 h-4" />
+      </button>
+    </div>
+
+  </div>
+</dialog>
 
 <script>
   import Croppie from 'croppie'
-  import { Modal } from 'flowbite'
   import { $ } from '@/utils/domSelector'
 
-  // Modal
-  // select the two elements that we'll work with
-  const $modalElement = $('#cropImgModal')
-  const modal = new Modal($modalElement)
-
-  // Declare variables
+  const dialog = $<HTMLDialogElement>('#cropImgModal')
   const $upload = $<HTMLInputElement>('#upload')
-  const $imgContainer = $('#croppieContainer')
+  const $imgContainer = $('#croppieContainer') as HTMLElement
   const $croppedImage = $<HTMLImageElement>('#croppedImage')
-  const $cropButton = $<HTMLButtonElement>('#btnCrop')
-  const $resetCropButton = $<HTMLButtonElement>('#resetCrop')
-  const $nextButton = $<HTMLButtonElement>('#next')
+  const $cropView = $('#cropView') as HTMLElement
+  const $previewView = $('#previewView') as HTMLElement
+  const $btnCrop = $<HTMLButtonElement>('#btnCrop')
+  const $btnReset = $<HTMLButtonElement>('#resetCrop')
+  const $btnNext = $<HTMLButtonElement>('#next')
+  const $closeBtn = $<HTMLButtonElement>('#closeModal')
+  const $modalTitle = $('#modalTitle') as HTMLElement
+  const $modalSubtitle = $('#modalSubtitle') as HTMLElement
 
-  $croppedImage.style.display = 'none'
-  $resetCropButton.style.display = 'none'
-
-  // Initialize Cropie
-  const croppieInstance = new Croppie($imgContainer, {
+  const croppie = new Croppie($imgContainer, {
     viewport: { width: 170.6, height: 208.3, type: 'square' },
     boundary: { width: 210, height: 200 },
     enabledResize: true,
   })
 
+  function showCropView() {
+    $cropView.classList.remove('hidden')
+    $previewView.classList.add('hidden')
+    $previewView.classList.remove('flex')
+    $btnCrop.classList.remove('hidden')
+    $btnReset.classList.add('hidden')
+    $btnReset.classList.remove('flex')
+    $btnNext.classList.add('hidden')
+    $btnNext.classList.remove('flex')
+    $modalTitle.textContent = 'Recortá tu foto'
+    $modalSubtitle.textContent = 'Ajustá el encuadre para tu ID'
+  }
+
+  function showPreviewView() {
+    $cropView.classList.add('hidden')
+    $previewView.classList.remove('hidden')
+    $previewView.classList.add('flex')
+    $btnCrop.classList.add('hidden')
+    $btnReset.classList.remove('hidden')
+    $btnReset.classList.add('flex')
+    $btnNext.classList.remove('hidden')
+    $btnNext.classList.add('flex')
+    $modalTitle.textContent = 'Confirmá tu foto'
+    $modalSubtitle.textContent = 'Así va a aparecer en tu ID'
+  }
+
   $upload?.addEventListener('change', (e) => {
-    const allowedExtensions = new Array('image/png', 'image/jpeg', 'image/webp')
     const target = e.target as HTMLInputElement
-    const file: File = (target.files as FileList)[0]
+    const file = (target.files as FileList)[0]
+    const allowed = ['image/png', 'image/jpeg', 'image/webp']
 
-    if (!allowedExtensions.includes(file.type)) {
-      // TODO: Return toast error
-      return
-    }
+    if (!allowed.includes(file.type)) return
 
-    modal.show()
-    const render = new FileReader()
-    render.onload = (event) => {
-      croppieInstance.bind({
-        url: event.target?.result,
-      })
+    showCropView()
+    dialog.showModal()
+
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      croppie.bind({ url: ev.target?.result as string })
     }
-    render.readAsDataURL(file)
+    reader.readAsDataURL(file)
   })
 
-  // Event close modal
-  modal.updateOnHide(() => {
-    if (!$croppedImage.src) {
+  function closeDialog() {
+    if (!$croppedImage.src || $croppedImage.src === window.location.href) {
+      $upload.value = ''
+    }
+    dialog.close()
+  }
+
+  $closeBtn?.addEventListener('click', closeDialog)
+  $btnNext?.addEventListener('click', closeDialog)
+
+  // Cerrar al hacer click en el backdrop (área fuera del dialog)
+  dialog?.addEventListener('click', (e) => {
+    const rect = dialog.getBoundingClientRect()
+    const isInside =
+      e.clientX >= rect.left &&
+      e.clientX <= rect.right &&
+      e.clientY >= rect.top &&
+      e.clientY <= rect.bottom
+    if (!isInside) closeDialog()
+  })
+
+  // Escape ya es manejado nativamente por <dialog>
+  dialog?.addEventListener('cancel', () => {
+    if (!$croppedImage.src || $croppedImage.src === window.location.href) {
       $upload.value = ''
     }
   })
 
-  $nextButton?.addEventListener('click', () => modal.hide())
-
-  // Handle crop button click
-  $cropButton?.addEventListener('click', () => {
-    croppieInstance.result('canvas').then((result: string) => {
-      // Show Cropped Image
+  $btnCrop?.addEventListener('click', () => {
+    croppie.result('canvas').then((result: string) => {
       $croppedImage.src = result
-      $croppedImage.style.display = 'block'
-      $resetCropButton.style.display = 'block'
-
-      $cropButton.style.display = 'none'
-      $imgContainer.style.display = 'none'
+      showPreviewView()
     })
   })
 
-  $resetCropButton?.addEventListener('click', () => {
-    $croppedImage.style.display = 'none'
-    $resetCropButton.style.display = 'none'
-    $imgContainer.style.display = 'block'
-    $cropButton.style.display = 'block'
-  })
+  $btnReset?.addEventListener('click', showCropView)
 </script>
 
 <style is:global>
   @import url('croppie/croppie.css');
+
+  .crop-dialog {
+    background: #0d1528;
+    border: 1px solid #1e3a5f;
+    border-radius: 0.75rem;
+    padding: 0;
+    width: 100%;
+    max-width: 420px;
+    color: white;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  }
+
+  .crop-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Croppie dark theme */
+  .crop-dialog .cr-viewport {
+    border: 2px solid rgba(245, 158, 11, 0.7) !important;
+    box-shadow: 0 0 0 2000px rgba(6, 11, 22, 0.8) !important;
+  }
+  .crop-dialog .cr-slider {
+    accent-color: #f59e0b;
+  }
 </style>

@@ -1,13 +1,36 @@
-<div class="relative max-w-[527px]">
+<div class="relative w-full max-w-[527px]">
   <div
     class="hidden lg:block w-[527px] h-[326px] bg-amber-400 absolute -z-[1] blur-md opacity-20"
   >
   </div>
-  <canvas
-    id="mclovin-canvas"
-    class="w-full h-full lg:w-[527px] lg:h-[326px] rounded-md bg-transparent border border-hawaii-steel"
-    width="527"
-    height="326"></canvas>
+
+  <!-- Perspective wrapper -->
+  <div class="flip-perspective">
+
+    <!-- Flip container (recibe .is-flipped via JS) -->
+    <div id="flip-container" class="flip-card">
+
+      <!-- Cara frontal -->
+      <div class="flip-face">
+        <canvas
+          id="mclovin-canvas"
+          class="w-full h-full lg:w-[527px] lg:h-[326px] rounded-md bg-transparent border border-hawaii-steel"
+          width="527"
+          height="326"
+        ></canvas>
+      </div>
+
+      <!-- Cara trasera -->
+      <div class="flip-face flip-back">
+        <img
+          src="/images/mclovin-id-back.webp"
+          alt="McLovin ID back"
+          class="w-full h-full rounded-md object-cover"
+        />
+      </div>
+
+    </div>
+  </div>
 
   <img
     hidden
@@ -30,6 +53,51 @@
     alt="McLovin Sign"
   />
 </div>
+
+<style>
+  .flip-perspective {
+    perspective: 1000px;
+    width: 100%;
+    aspect-ratio: 527 / 326;
+  }
+
+  @media (min-width: 1024px) {
+    .flip-perspective {
+      width: 527px;
+      height: 326px;
+      aspect-ratio: auto;
+    }
+  }
+
+  .flip-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 600ms ease-in-out;
+  }
+
+  @media (min-width: 1024px) {
+    .flip-card {
+      width: 527px;
+      height: 326px;
+    }
+  }
+
+  .flip-card.is-flipped {
+    transform: rotateY(180deg);
+  }
+
+  .flip-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+  }
+
+  .flip-back {
+    transform: rotateY(180deg);
+  }
+</style>
 
 <script>
   import { mclovin, fontSize } from '@/const/mclovinData'

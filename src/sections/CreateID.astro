@@ -14,7 +14,7 @@ import Download from '@/icons/download.astro'
   <div class="mx-auto w-full max-w-screen-lg px-4 md:px-6">
 
     <!-- Section header -->
-    <div class="text-center mb-10">
+    <div data-animate class="opacity-0 animate-fade-in text-center mb-10">
       <span class="inline-block text-xs tracking-[0.3em] uppercase text-hawaii-blue-light border border-hawaii-steel rounded-full px-3 py-1 mb-4">
         Crea tu ID
       </span>
@@ -30,20 +30,33 @@ import Download from '@/icons/download.astro'
     <div class="flex flex-col-reverse md:flex-row gap-6 mb-8">
 
       <!-- Canvas / Preview column -->
-      <div class="w-full md:w-auto flex flex-col items-center gap-4">
+      <div data-animate class="opacity-0 animate-scale-in w-full md:w-auto flex flex-col items-center gap-4">
         <!-- Interactive canvas -->
         <McLovinCanvas />
+
+        <!-- Botón flip, visible solo en md+ (donde el canvas es visible) -->
+        <Button id="flipCard" color="info" variant="outlined" size="sm" class="hidden md:inline-flex">
+          Ver reverso
+        </Button>
       </div>
 
       <!-- Form column -->
       <form id="form" class="w-full">
-        <Input id="name" label="Nombre" class="mb-5" maxlength="15" />
-        <div class="flex gap-3 mb-5">
-          <Input id="dob" type="date" label="Fecha de nacimiento" class="flex-auto" />
-          <Select id="sex" label="Género" options={genresOptions} />
+        <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 0ms">
+          <Input id="name" label="Nombre" class="mb-5" maxlength="15" />
         </div>
-        <TakePhoto />
-        <Sign />
+        <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 100ms">
+          <div class="flex gap-3 mb-5">
+            <Input id="dob" type="date" label="Fecha de nacimiento" class="flex-auto" />
+            <Select id="sex" label="Género" options={genresOptions} />
+          </div>
+        </div>
+        <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 200ms">
+          <TakePhoto />
+        </div>
+        <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 300ms">
+          <Sign />
+        </div>
       </form>
 
     </div>
@@ -63,6 +76,7 @@ import Download from '@/icons/download.astro'
 
   const $canvas = $<HTMLCanvasElement>('#mclovin-canvas')
   const $exportCanvasButton = $<HTMLButtonElement>('#exportCanvas')
+  const $flipContainer = document.getElementById('flip-container')
 
   $exportCanvasButton.onclick = () => {
     $exportCanvasButton.disabled = true
@@ -73,7 +87,20 @@ import Download from '@/icons/download.astro'
     downloadLink.click()
 
     setTimeout(() => {
-      $exportCanvasButton.disabled = false
+      if (!$flipContainer?.classList.contains('is-flipped')) {
+        $exportCanvasButton.disabled = false
+      }
     }, 1000)
+  }
+
+  // --- Flip logic ---
+  const $flipCard = $<HTMLButtonElement>('#flipCard')
+
+  if ($flipCard && $flipContainer) {
+    $flipCard.addEventListener('click', () => {
+      const isFlipped = $flipContainer.classList.toggle('is-flipped')
+      $flipCard.textContent = isFlipped ? 'Ver frente' : 'Ver reverso'
+      $exportCanvasButton.disabled = isFlipped
+    })
   }
 </script>

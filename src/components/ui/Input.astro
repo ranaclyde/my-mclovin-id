@@ -30,9 +30,9 @@ const isInputFile = type === 'file'
     class:list={{
       'p-2.5 text-white focus:ring-amber-500 focus:border-amber-500':
         !isInputFile,
-      'border cursor-pointer text-slate-400 focus:outline-none': isInputFile,
+      'p-2.5 border cursor-pointer text-slate-400 focus:outline-none': isInputFile,
     }}
-    class="block w-full text-sm rounded-lg bg-hawaii-input border-hawaii-steel placeholder-slate-500"
+    class="block w-full text-sm rounded-lg bg-hawaii-input border-hawaii-steel placeholder-slate-500 transition-[border-color,box-shadow] duration-150 ease-in-out hover:border-amber-500"
     required={isRequired}
     {...otherProps}
   />

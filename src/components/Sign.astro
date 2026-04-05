@@ -10,8 +10,9 @@ import Reload from '@/icons/reload.astro'
     <canvas
       class="border border-hawaii-steel rounded-md bg-hawaii-input"
       id="drawSignCanvas"
-      width="auto"
-      height="120"></canvas>
+      width="300"
+      height="120"
+      style="touch-action: none;"></canvas>
     <img hidden alt="McLovin Sign" id="signImage" height="120" width="auto" />
     <div class="flex flex-col gap-1">
       <Button
@@ -58,7 +59,18 @@ import Reload from '@/icons/reload.astro'
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
   ctx.strokeStyle = 'black'
-  ctx.lineWidth = 1
+  ctx.lineWidth = 1.5
+
+  function drawPlaceholder() {
+    ctx.save()
+    ctx.fillStyle = 'rgba(255,255,255,0.25)'
+    ctx.font = '13px Arial'
+    ctx.textAlign = 'center'
+    ctx.fillText('Firmá aquí', $canvas.width / 2, $canvas.height / 2)
+    ctx.restore()
+  }
+
+  drawPlaceholder()
 
   // Functions
   function clearCanvas() {
@@ -91,6 +103,7 @@ import Reload from '@/icons/reload.astro'
 
   const clearEventHandler = () => {
     clearCanvas()
+    drawPlaceholder()
     $signImage.src = ''
   }
 
@@ -106,6 +119,9 @@ import Reload from '@/icons/reload.astro'
   const pressEventHandler = (e: MouseEvent | TouchEvent) => {
     const { mouseX, mouseY } = mouseAndTouchsEvents(e)
 
+    if (!paint && clickX.length === 0) {
+      ctx.clearRect(0, 0, $canvas.width, $canvas.height)
+    }
     paint = true
     addClick(mouseX, mouseY, false)
     redraw()
@@ -123,16 +139,17 @@ import Reload from '@/icons/reload.astro'
   }
 
   const mouseAndTouchsEvents = (e: MouseEvent | TouchEvent) => {
-    let mouseX = (e as TouchEvent).changedTouches
-      ? (e as TouchEvent).changedTouches[0].pageX
-      : (e as MouseEvent).pageX
-    let mouseY = (e as TouchEvent).changedTouches
-      ? (e as TouchEvent).changedTouches[0].pageY
-      : (e as MouseEvent).pageY
-    mouseX -= $canvas.offsetLeft
-    mouseY -= $canvas.offsetTop
-
-    return { mouseX, mouseY }
+    const rect = $canvas.getBoundingClientRect()
+    const clientX = (e as TouchEvent).changedTouches
+      ? (e as TouchEvent).changedTouches[0].clientX
+      : (e as MouseEvent).clientX
+    const clientY = (e as TouchEvent).changedTouches
+      ? (e as TouchEvent).changedTouches[0].clientY
+      : (e as MouseEvent).clientY
+    return {
+      mouseX: clientX - rect.left,
+      mouseY: clientY - rect.top,
+    }
   }
 
   // EventListeners
