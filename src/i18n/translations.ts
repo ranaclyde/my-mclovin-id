@@ -11,6 +11,10 @@ export interface PhotoTranslations {
   confirmTitle: string
   confirmSubtitle: string
   close: string
+  cameraBtn: string
+  cameraTitle: string
+  cameraSubtitle: string
+  cameraCaptureBtn: string
 }
 
 export interface SignTranslations {
@@ -116,6 +120,10 @@ export const translations: Record<string, FullTranslations> = {
         confirmTitle: 'Confirmá tu foto',
         confirmSubtitle: 'Así va a aparecer en tu ID',
         close: 'Cerrar',
+        cameraBtn: 'Usar cámara',
+        cameraTitle: 'Tomá una foto',
+        cameraSubtitle: 'Posicioná tu cara y capturá cuando estés listo',
+        cameraCaptureBtn: 'Capturar foto',
       },
       sign: {
         label: 'Firma',
@@ -179,6 +187,10 @@ export const translations: Record<string, FullTranslations> = {
         confirmTitle: 'Confirm your photo',
         confirmSubtitle: 'This is how it will appear on your ID',
         close: 'Close',
+        cameraBtn: 'Use camera',
+        cameraTitle: 'Take a photo',
+        cameraSubtitle: 'Position your face and capture when ready',
+        cameraCaptureBtn: 'Capture photo',
       },
       sign: {
         label: 'Signature',
