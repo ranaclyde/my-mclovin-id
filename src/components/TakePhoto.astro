@@ -4,18 +4,32 @@ import Check from '@/icons/check.astro'
 import Reload from '@/icons/reload.astro'
 import Close from '@/icons/close.astro'
 import ArrowFoward from '@/icons/arrowFoward.astro'
+import type { PhotoTranslations } from '@/i18n/translations'
+
+interface Props {
+  t: PhotoTranslations
+}
+
+const { t } = Astro.props
 ---
 
 <Input
   id="upload"
   type="file"
-  label="Subí tu foto"
+  label={t.label}
   class="mb-5"
   accept="image/png, image/jpeg, image/webp"
-  placeholder="Seleccioná una imagen para tu ID"
+  placeholder={t.placeholder}
 />
 
-<dialog id="cropImgModal" class="crop-dialog">
+<dialog
+  id="cropImgModal"
+  class="crop-dialog"
+  data-crop-title={t.cropTitle}
+  data-crop-subtitle={t.cropSubtitle}
+  data-confirm-title={t.confirmTitle}
+  data-confirm-subtitle={t.confirmSubtitle}
+>
   <!-- Gold accent bar -->
   <div class="h-1 w-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 rounded-t-xl"></div>
 
@@ -29,8 +43,8 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
         </svg>
       </div>
       <div>
-        <h3 id="modalTitle" class="text-base font-bold text-white">Recortá tu foto</h3>
-        <p id="modalSubtitle" class="text-xs text-slate-400">Ajustá el encuadre para tu ID</p>
+        <h3 id="modalTitle" class="text-base font-bold text-white">{t.cropTitle}</h3>
+        <p id="modalSubtitle" class="text-xs text-slate-400">{t.cropSubtitle}</p>
       </div>
     </div>
     <button
@@ -39,7 +53,7 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
       class="w-8 h-8 rounded-lg inline-flex items-center justify-center text-slate-500 hover:bg-hawaii-steel/60 hover:text-white transition-colors"
     >
       <Close />
-      <span class="sr-only">Cerrar</span>
+      <span class="sr-only">{t.close}</span>
     </button>
   </div>
 
@@ -49,7 +63,7 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
     <!-- Croppie -->
     <div id="cropView">
       <div id="croppieContainer"></div>
-      <p class="text-xs text-slate-500 text-center mt-2">Arrastrá y hacé zoom para ajustar</p>
+      <p class="text-xs text-slate-500 text-center mt-2">{t.cropHint}</p>
     </div>
 
     <!-- Preview (oculto hasta que se recorta) -->
@@ -61,7 +75,7 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
         height="208"
         class="rounded-lg border-2 border-amber-500/50 block"
       />
-      <p class="text-xs text-slate-400">¿Quedó bien? Usá esta foto o recortá de nuevo</p>
+      <p class="text-xs text-slate-400">{t.confirmQuestion}</p>
     </div>
 
     <!-- Botones -->
@@ -72,7 +86,7 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
         class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-hawaii-navy font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
       >
         <Check class="w-4 h-4" />
-        Recortar foto
+        {t.cropBtn}
       </button>
 
       <button
@@ -81,7 +95,7 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
         class="hidden flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-hawaii-steel hover:border-amber-500/40 hover:bg-hawaii-steel/40 text-slate-300 hover:text-white font-medium text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
       >
         <Reload class="w-4 h-4" />
-        Recortar de nuevo
+        {t.recropBtn}
       </button>
 
       <button
@@ -89,7 +103,7 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
         type="button"
         class="hidden flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-hawaii-navy font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
       >
-        Usar esta foto
+        {t.useBtn}
         <ArrowFoward class="w-4 h-4" />
       </button>
     </div>
@@ -129,8 +143,8 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
     $btnReset.classList.remove('flex')
     $btnNext.classList.add('hidden')
     $btnNext.classList.remove('flex')
-    $modalTitle.textContent = 'Recortá tu foto'
-    $modalSubtitle.textContent = 'Ajustá el encuadre para tu ID'
+    $modalTitle.textContent = dialog.dataset.cropTitle ?? ''
+    $modalSubtitle.textContent = dialog.dataset.cropSubtitle ?? ''
   }
 
   function showPreviewView() {
@@ -142,8 +156,8 @@ import ArrowFoward from '@/icons/arrowFoward.astro'
     $btnReset.classList.add('flex')
     $btnNext.classList.remove('hidden')
     $btnNext.classList.add('flex')
-    $modalTitle.textContent = 'Confirmá tu foto'
-    $modalSubtitle.textContent = 'Así va a aparecer en tu ID'
+    $modalTitle.textContent = dialog.dataset.confirmTitle ?? ''
+    $modalSubtitle.textContent = dialog.dataset.confirmSubtitle ?? ''
   }
 
   $upload?.addEventListener('change', (e) => {

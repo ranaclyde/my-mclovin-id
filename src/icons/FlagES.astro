@@ -1,0 +1,17 @@
+---
+interface Props {
+  class?: string
+}
+const { class: className } = Astro.props
+---
+
+<!-- Spain flag: red/yellow/red horizontal stripes -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 20 14"
+  class:list={['rounded-sm', className]}
+  aria-hidden="true"
+>
+  <rect width="20" height="14" fill="#c60b1e" rx="1" />
+  <rect y="3.5" width="20" height="7" fill="#ffc400" />
+</svg>

@@ -1,5 +1,15 @@
 ---
 import Button from '@/components/ui/Button.astro'
+import FlagES from '@/icons/FlagES.astro'
+import FlagEN from '@/icons/FlagEN.astro'
+import type { NavbarTranslations } from '@/i18n/translations'
+
+interface Props {
+  t: NavbarTranslations
+}
+
+const { t } = Astro.props
+const currentLocale = Astro.currentLocale ?? 'es'
 ---
 
 <nav class="border-b border-hawaii-steel bg-hawaii-dark px-4 md:px-6">
@@ -12,10 +22,44 @@ import Button from '@/components/ui/Button.astro'
         >My McLovin ID</span
       >
     </div>
-    <div class="hidden lg:flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-      <a href="#createid-section">
-        <Button>Comenzar</Button>
-      </a>
+
+    <div class="flex items-center gap-4 md:order-2">
+      <!-- Language switcher -->
+      <div class="flex items-center gap-1 rounded-lg border border-hawaii-steel p-1">
+        <a
+          href="/"
+          title="Español"
+          class:list={[
+            'flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-all duration-150',
+            currentLocale === 'es'
+              ? 'bg-hawaii-steel text-white'
+              : 'text-slate-400 hover:text-white hover:bg-hawaii-steel/50',
+          ]}
+        >
+          <FlagES class="w-5 h-3.5 flex-shrink-0" />
+          <span>ES</span>
+        </a>
+        <a
+          href="/en"
+          title="English"
+          class:list={[
+            'flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-all duration-150',
+            currentLocale === 'en'
+              ? 'bg-hawaii-steel text-white'
+              : 'text-slate-400 hover:text-white hover:bg-hawaii-steel/50',
+          ]}
+        >
+          <FlagEN class="w-5 h-3.5 flex-shrink-0" />
+          <span>EN</span>
+        </a>
+      </div>
+
+      <!-- CTA button (hidden on small screens) -->
+      <div class="hidden lg:flex">
+        <a href="#createid-section">
+          <Button>{t.start}</Button>
+        </a>
+      </div>
     </div>
   </div>
 </nav>

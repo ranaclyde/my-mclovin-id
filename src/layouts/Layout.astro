@@ -1,26 +1,27 @@
 ---
 import Footer from '@/sections/Footer.astro'
 import Navbar from '@/sections/Navbar.astro'
+import type { FullTranslations } from '@/i18n/translations'
 
 interface Props {
-  title: string
+  t: FullTranslations
 }
 
-const { title } = Astro.props
+const { t } = Astro.props
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={t.lang}>
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Crea tu propio ID falso de McLovin de la película Superbad. Personaliza nombre, fecha de nacimiento, foto y firma." />
+    <meta name="description" content={t.description} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/webp" href="/favicon.webp" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>{t.title}</title>
   </head>
   <body class="bg-hawaii-navy">
-    <Navbar />
+    <Navbar t={t.navbar} />
     <slot />
     <Footer />
   </body>

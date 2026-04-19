@@ -2,12 +2,17 @@
 import Input from '@/components/ui/Input.astro'
 import McLovinCanvas from '@/components/McLovinCanvas.astro'
 import Select from '@/components/ui/Select.astro'
-
-import { genresOptions } from '@/const/genres'
 import TakePhoto from '@/components/TakePhoto.astro'
 import Sign from '@/components/Sign.astro'
 import Button from '@/components/ui/Button.astro'
 import Download from '@/icons/download.astro'
+import type { CreateIdTranslations } from '@/i18n/translations'
+
+interface Props {
+  t: CreateIdTranslations
+}
+
+const { t } = Astro.props
 ---
 
 <section id="createid-section" class="bg-hawaii-navy py-16">
@@ -16,13 +21,13 @@ import Download from '@/icons/download.astro'
     <!-- Section header -->
     <div data-animate class="opacity-0 animate-fade-in text-center mb-10">
       <span class="inline-block text-xs tracking-[0.3em] uppercase text-hawaii-blue-light border border-hawaii-steel rounded-full px-3 py-1 mb-4">
-        Crea tu ID
+        {t.badge}
       </span>
       <h2 class="text-3xl font-bold text-hawaii-gold-light mt-3">
-        Personaliza tu documento
+        {t.title}
       </h2>
       <p class="text-slate-400 mt-2">
-        Completá los datos y descargá tu versión del ID de McLovin
+        {t.subtitle}
       </p>
     </div>
 
@@ -35,27 +40,35 @@ import Download from '@/icons/download.astro'
         <McLovinCanvas />
 
         <!-- Botón flip, visible solo en md+ (donde el canvas es visible) -->
-        <Button id="flipCard" color="info" variant="outlined" size="sm" class="hidden md:inline-flex">
-          Ver reverso
+        <Button
+          id="flipCard"
+          color="info"
+          variant="outlined"
+          size="sm"
+          class="hidden md:inline-flex"
+          data-front={t.flipFront}
+          data-back={t.flipBack}
+        >
+          {t.flipBack}
         </Button>
       </div>
 
       <!-- Form column -->
       <form id="form" class="w-full">
         <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 0ms">
-          <Input id="name" label="Nombre" class="mb-5" maxlength="15" />
+          <Input id="name" label={t.name} class="mb-5" maxlength="15" />
         </div>
         <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 100ms">
           <div class="flex gap-3 mb-5">
-            <Input id="dob" type="date" label="Fecha de nacimiento" class="flex-auto" />
-            <Select id="sex" label="Género" options={genresOptions} />
+            <Input id="dob" type="date" label={t.dob} class="flex-auto" />
+            <Select id="sex" label={t.genre} options={t.genres} />
           </div>
         </div>
         <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 200ms">
-          <TakePhoto />
+          <TakePhoto t={t.photo} />
         </div>
         <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 300ms">
-          <Sign />
+          <Sign t={t.sign} />
         </div>
       </form>
 
@@ -64,7 +77,7 @@ import Download from '@/icons/download.astro'
     <!-- Export button -->
     <div class="text-center">
       <Button id="exportCanvas" size="lg" class="min-w-48">
-        Exportar ID
+        {t.export}
         <Download />
       </Button>
     </div>
@@ -99,7 +112,9 @@ import Download from '@/icons/download.astro'
   if ($flipCard && $flipContainer) {
     $flipCard.addEventListener('click', () => {
       const isFlipped = $flipContainer.classList.toggle('is-flipped')
-      $flipCard.textContent = isFlipped ? 'Ver frente' : 'Ver reverso'
+      $flipCard.textContent = isFlipped
+        ? ($flipCard.dataset.front ?? '')
+        : ($flipCard.dataset.back ?? '')
       $exportCanvasButton.disabled = isFlipped
     })
   }

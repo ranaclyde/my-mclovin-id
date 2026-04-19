@@ -2,17 +2,26 @@
 import Button from '@/components/ui/Button.astro'
 import Check from '@/icons/check.astro'
 import Reload from '@/icons/reload.astro'
+import type { SignTranslations } from '@/i18n/translations'
+
+interface Props {
+  t: SignTranslations
+}
+
+const { t } = Astro.props
 ---
 
 <div>
-  <span class="block mb-2 text-sm font-medium text-white"> Signature </span>
+  <span class="block mb-2 text-sm font-medium text-white">{t.label}</span>
   <div class="flex gap-2">
     <canvas
       class="border border-hawaii-steel rounded-md bg-hawaii-input"
       id="drawSignCanvas"
       width="300"
       height="120"
-      style="touch-action: none;"></canvas>
+      style="touch-action: none;"
+      data-placeholder={t.placeholder}
+    ></canvas>
     <img hidden alt="McLovin Sign" id="signImage" height="120" width="auto" />
     <div class="flex flex-col gap-1">
       <Button
@@ -62,11 +71,12 @@ import Reload from '@/icons/reload.astro'
   ctx.lineWidth = 1.5
 
   function drawPlaceholder() {
+    const placeholder = $canvas.dataset.placeholder ?? 'Sign here'
     ctx.save()
     ctx.fillStyle = 'rgba(255,255,255,0.25)'
     ctx.font = '13px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText('Firmá aquí', $canvas.width / 2, $canvas.height / 2)
+    ctx.fillText(placeholder, $canvas.width / 2, $canvas.height / 2)
     ctx.restore()
   }
 

@@ -1,4 +1,11 @@
 ---
+import type { AboutTranslations } from '@/i18n/translations'
+
+interface Props {
+  t: AboutTranslations
+}
+
+const { t } = Astro.props
 ---
 
 <section id="about" class="bg-hawaii-card py-16">
@@ -7,10 +14,10 @@
     <!-- Header -->
     <div data-animate class="opacity-0 animate-fade-in text-center mb-12">
       <span class="inline-block text-xs tracking-[0.3em] uppercase text-hawaii-blue-light border border-hawaii-steel rounded-full px-3 py-1 mb-4">
-        Sobre el personaje
+        {t.badge}
       </span>
       <h2 class="text-3xl md:text-4xl font-bold text-hawaii-gold-light mt-3">
-        ¿Quién es McLovin?
+        {t.title}
       </h2>
     </div>
 
@@ -19,27 +26,18 @@
 
       <!-- Left: text -->
       <div data-animate class="opacity-0 animate-slide-up">
-        <p class="text-slate-300 text-base leading-relaxed mb-4">
-          McLovin es el alter ego de Fogell en la película <strong class="text-white">Superbad (conocida como Supercool en Latinoamérica)</strong> (2007),
-          dirigida por Greg Mottola y producida por Judd Apatow. Fogell decide obtener una
-          identificación falsa del estado de Hawaii, y cuando sus amigos le preguntan su nombre,
-          él revela orgulloso que se llama simplemente "McLovin".
-        </p>
-        <p class="text-slate-300 text-base leading-relaxed mb-6">
-          Con solo un nombre en su documento —sin apellido, sin dirección, sin nada más—,
-          McLovin se convirtió en uno de los momentos más icónicos de la comedia juvenil
-          de los 2000s. La escena del ID es considerada una de las más memorables de la película.
-        </p>
+        <p class="text-slate-300 text-base leading-relaxed mb-4" set:html={t.paragraph1} />
+        <p class="text-slate-300 text-base leading-relaxed mb-6" set:html={t.paragraph2} />
 
         <!-- Stats -->
         <div class="flex gap-8 mt-6">
           <div class="text-center">
             <span class="block text-2xl font-black text-amber-400">2007</span>
-            <span class="text-xs text-slate-500 uppercase tracking-wider">Año de estreno</span>
+            <span class="text-xs text-slate-500 uppercase tracking-wider">{t.year}</span>
           </div>
           <div class="text-center">
             <span class="block text-2xl font-black text-amber-400">Christopher Mintz-Plasse</span>
-            <span class="text-xs text-slate-500 uppercase tracking-wider">Interpretado por</span>
+            <span class="text-xs text-slate-500 uppercase tracking-wider">{t.actor}</span>
           </div>
         </div>
       </div>
@@ -47,8 +45,8 @@
       <!-- Right: YouTube embed -->
       <div data-animate class="opacity-0 animate-scale-in relative aspect-video rounded-xl overflow-hidden border border-hawaii-steel shadow-xl" style="animation-delay: 200ms">
         <iframe
-          src="https://www.youtube.com/embed/vqQmTyOHTsw"
-          title="McLovin ID scene - Superbad"
+          src={t.videoUrl}
+          title={t.videoTitle}
           class="w-full h-full"
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
