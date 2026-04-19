@@ -15,6 +15,7 @@
     "astro": "5.18.1",
     "butterup-toast": "^0.0.1",
     "croppie": "^2.6.5",
+    "jszip": "^3.10.1",
     "tailwindcss": "3.4.3",
     "typescript": "5.9.3"
   },

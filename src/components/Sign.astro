@@ -67,7 +67,7 @@ const { t } = Astro.props
   // Config
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
-  ctx.strokeStyle = 'black'
+  ctx.strokeStyle = '#ffffff'
   ctx.lineWidth = 1.5
 
   function drawPlaceholder() {
@@ -175,7 +175,34 @@ const { t } = Astro.props
 
   $signClearButton.addEventListener('click', clearEventHandler)
 
+  function buildSignatureImage(): string | null {
+    if (clickX.length === 0) return null
+    const offscreen = document.createElement('canvas')
+    offscreen.width = $canvas.width
+    offscreen.height = $canvas.height
+    const offCtx = offscreen.getContext('2d')!
+    offCtx.strokeStyle = '#000000'
+    offCtx.lineCap = 'round'
+    offCtx.lineJoin = 'round'
+    offCtx.lineWidth = 1.5
+    for (let i = 0; i < clickX.length; i++) {
+      offCtx.beginPath()
+      if (clickDrag[i] && i) {
+        offCtx.moveTo(clickX[i - 1], clickY[i - 1])
+      } else {
+        offCtx.moveTo(clickX[i] - 1, clickY[i])
+      }
+      offCtx.lineTo(clickX[i], clickY[i])
+      offCtx.stroke()
+    }
+    offCtx.closePath()
+    return offscreen.toDataURL('image/png')
+  }
+
   $signButton.addEventListener('click', () => {
-    $signImage.src = $canvas.toDataURL()
+    const dataUrl = buildSignatureImage()
+    if (dataUrl !== null) {
+      $signImage.src = dataUrl
+    }
   })
 </script>

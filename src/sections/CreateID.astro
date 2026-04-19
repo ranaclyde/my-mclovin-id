@@ -86,25 +86,57 @@ const { t } = Astro.props
 
 <script>
   import { $ } from '@/utils/domSelector'
+  import JSZip from 'jszip'
 
   const $canvas = $<HTMLCanvasElement>('#mclovin-canvas')
   const $exportCanvasButton = $<HTMLButtonElement>('#exportCanvas')
   const $flipContainer = document.getElementById('flip-container')
 
-  $exportCanvasButton.onclick = () => {
+  async function exportZip(): Promise<void> {
     $exportCanvasButton.disabled = true
+    try {
+      const frontDataUrl = $canvas.toDataURL('image/png')
+      const base64 = frontDataUrl.split(',')[1]
+      const binary = atob(base64)
+      const frontBytes = new Uint8Array(binary.length)
+      for (let i = 0; i < binary.length; i++) {
+        frontBytes[i] = binary.charCodeAt(i)
+      }
 
-    let downloadLink = document.createElement('a')
-    downloadLink.href = $canvas.toDataURL()
-    downloadLink.download = 'my-mclovin-id.png'
-    downloadLink.click()
+      const zip = new JSZip()
+      zip.file('mclovin-id-front.png', frontBytes)
 
-    setTimeout(() => {
+      try {
+        const res = await fetch('/images/mclovin-id-back.webp')
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const backBuf = await res.arrayBuffer()
+        zip.file('mclovin-id-back.webp', backBuf)
+      } catch {
+        window.toast?.({
+          type: 'warning',
+          title: 'Back side skipped',
+          message: 'Could not include the ID back. Exporting front only.',
+        })
+      }
+
+      const blob = await zip.generateAsync({ type: 'blob' })
+      const anchor = document.createElement('a')
+      const objectUrl = URL.createObjectURL(blob)
+      anchor.href = objectUrl
+      anchor.download = 'my-mclovin-id.zip'
+      anchor.click()
+      URL.revokeObjectURL(objectUrl)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      window.toast?.({ type: 'error', title: 'Export failed', message })
+    } finally {
       if (!$flipContainer?.classList.contains('is-flipped')) {
         $exportCanvasButton.disabled = false
       }
-    }, 1000)
+    }
   }
+
+  $exportCanvasButton.onclick = exportZip
 
   // --- Flip logic ---
   const $flipCard = $<HTMLButtonElement>('#flipCard')
