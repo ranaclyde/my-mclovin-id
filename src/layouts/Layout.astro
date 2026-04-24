@@ -8,17 +8,66 @@ interface Props {
 }
 
 const { t } = Astro.props
+
+const site = Astro.site!.toString().replace(/\/$/, '')
+const canonicalUrl = t.lang === 'en' ? `${site}/en/` : `${site}/`
+const esUrl = `${site}/`
+const enUrl = `${site}/en/`
+const ogImage = `${site}/images/screenshot.jpg`
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'My McLovin ID',
+  url: canonicalUrl,
+  description: t.description,
+  applicationCategory: 'EntertainmentApplication',
+  operatingSystem: 'Web',
+  inLanguage: t.lang,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+}
 ---
 
 <!doctype html>
 <html lang={t.lang}>
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content={t.description} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={t.description} />
+    <meta name="robots" content="index, follow" />
     <link rel="icon" type="image/webp" href="/favicon.webp" />
     <meta name="generator" content={Astro.generator} />
     <title>{t.title}</title>
+
+    <!-- Canonical & hreflang -->
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="es" href={esUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={esUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={t.title} />
+    <meta property="og:description" content={t.description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="My McLovin ID" />
+    <meta property="og:locale" content={t.lang === 'en' ? 'en_US' : 'es_ES'} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={t.title} />
+    <meta name="twitter:description" content={t.description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Structured data -->
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body class="bg-hawaii-navy">
     <Navbar t={t.navbar} />
