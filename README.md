@@ -41,10 +41,9 @@ Una webapp inspirada en el icónico ID falso de **Fogell / McLovin** de la pelí
 | [Astro 5](https://astro.build) | Framework principal (SSG, sin JS innecesario) |
 | [Tailwind CSS 3](https://tailwindcss.com) | Estilos utilitarios |
 | [TypeScript](https://typescriptlang.org) | Tipado estático en modo strict |
+| [butterup-toast](https://butterup-toast.netlify.app) | Notificaciones toast |
 | [Croppie](https://foliotek.github.io/Croppie/) | Recorte y zoom de la foto de perfil |
 | [JSZip](https://stuk.github.io/jszip/) | Exportación de ambas caras del ID en ZIP |
-| [Flowbite](https://flowbite.com) | Componentes UI (modales) |
-| [butterup-toast](https://github.com/Matth10/butterup) | Notificaciones toast |
 | [Netlify](https://netlify.com) | Hosting y deploy |
 
 ---

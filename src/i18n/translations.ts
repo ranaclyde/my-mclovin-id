@@ -20,6 +20,13 @@ export interface PhotoTranslations {
 export interface SignTranslations {
   label: string
   placeholder: string
+  addBtn: string
+  signedBtn: string
+  modalTitle: string
+  modalSubtitle: string
+  confirmBtn: string
+  clearBtn: string
+  close: string
 }
 
 export interface GenreOption {
@@ -132,6 +139,13 @@ export const translations: Record<string, FullTranslations> = {
       sign: {
         label: 'Firma',
         placeholder: 'Firmá aquí',
+        addBtn: 'Agregar firma',
+        signedBtn: 'Firma guardada · Toca para editar',
+        modalTitle: 'Dibujá tu firma',
+        modalSubtitle: 'Usá el dedo para firmar en el cuadro',
+        confirmBtn: 'Guardar firma',
+        clearBtn: 'Borrar',
+        close: 'Cerrar',
       },
     },
     about: {
@@ -201,6 +215,13 @@ export const translations: Record<string, FullTranslations> = {
       sign: {
         label: 'Signature',
         placeholder: 'Sign here',
+        addBtn: 'Add signature',
+        signedBtn: 'Signature saved · Tap to edit',
+        modalTitle: 'Draw your signature',
+        modalSubtitle: 'Use your finger to sign in the box',
+        confirmBtn: 'Save signature',
+        clearBtn: 'Clear',
+        close: 'Close',
       },
     },
     about: {

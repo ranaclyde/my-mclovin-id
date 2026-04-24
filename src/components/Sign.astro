@@ -2,6 +2,7 @@
 import Button from '@/components/ui/Button.astro'
 import Check from '@/icons/check.astro'
 import Reload from '@/icons/reload.astro'
+import Close from '@/icons/close.astro'
 import type { SignTranslations } from '@/i18n/translations'
 
 interface Props {
@@ -11,9 +12,25 @@ interface Props {
 const { t } = Astro.props
 ---
 
-<div>
+<div class="mb-5">
   <span class="block mb-2 text-sm font-medium text-white">{t.label}</span>
-  <div class="flex gap-2">
+
+  <!-- Mobile: button to open modal -->
+  <button
+    id="openSignModal"
+    type="button"
+    class="md:hidden flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-hawaii-steel hover:border-amber-500/40 hover:bg-hawaii-steel/40 text-slate-300 hover:text-white font-medium text-sm transition-all active:scale-[0.98]"
+    data-empty={t.addBtn}
+    data-signed={t.signedBtn}
+  >
+    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+    </svg>
+    <span id="signBtnLabel">{t.addBtn}</span>
+  </button>
+
+  <!-- Desktop: inline canvas -->
+  <div class="hidden md:flex gap-2">
     <canvas
       class="border border-hawaii-steel rounded-md bg-hawaii-input"
       id="drawSignCanvas"
@@ -22,187 +39,301 @@ const { t } = Astro.props
       style="touch-action: none;"
       data-placeholder={t.placeholder}
     ></canvas>
-    <img hidden alt="McLovin Sign" id="signImage" height="120" width="auto" />
     <div class="flex flex-col gap-1">
-      <Button
-        id="sign"
-        size="xs"
-        shape="pill"
-        color="success"
-        desc="Sign"
-        isOnlyIcon
-      >
+      <Button id="sign" size="xs" shape="pill" color="success" desc="Sign" isOnlyIcon>
         <Check />
       </Button>
-      <Button
-        id="signClear"
-        size="xs"
-        shape="pill"
-        color="info"
-        desc="Reload Sign"
-        isOnlyIcon
-      >
+      <Button id="signClear" size="xs" shape="pill" color="info" desc="Reload Sign" isOnlyIcon>
         <Reload />
       </Button>
     </div>
   </div>
 </div>
 
+<!-- Hidden image read by McLovinCanvas (always in DOM) -->
+<img hidden alt="McLovin Sign" id="signImage" height="120" width="auto" />
+
+<!-- Sign modal (mobile) -->
+<dialog id="signModal" class="sign-dialog">
+  <!-- Gold accent bar -->
+  <div class="h-1 w-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 rounded-t-xl"></div>
+
+  <!-- Header -->
+  <div class="flex items-center justify-between px-5 py-4 border-b border-hawaii-steel/60">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+        <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-white">{t.modalTitle}</h3>
+        <p class="text-xs text-slate-400">{t.modalSubtitle}</p>
+      </div>
+    </div>
+    <button
+      id="closeSignModal"
+      type="button"
+      class="w-8 h-8 rounded-lg inline-flex items-center justify-center text-slate-500 hover:bg-hawaii-steel/60 hover:text-white transition-colors"
+    >
+      <Close />
+      <span class="sr-only">{t.close}</span>
+    </button>
+  </div>
+
+  <!-- Body: canvas -->
+  <div class="px-5 py-5">
+    <canvas
+      id="signModalCanvas"
+      class="border border-hawaii-steel rounded-md bg-hawaii-input w-full"
+      width="320"
+      height="160"
+      style="touch-action: none; display: block;"
+      data-placeholder={t.placeholder}
+    ></canvas>
+  </div>
+
+  <!-- Footer: buttons -->
+  <div class="flex gap-3 px-5 pb-5">
+    <button
+      id="signModalClear"
+      type="button"
+      class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-hawaii-steel hover:border-amber-500/40 hover:bg-hawaii-steel/40 text-slate-300 hover:text-white font-medium text-sm transition-all active:scale-[0.98]"
+    >
+      <Reload class="w-4 h-4" />
+      {t.clearBtn}
+    </button>
+    <button
+      id="signModalConfirm"
+      type="button"
+      class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-hawaii-navy font-semibold text-sm transition-all active:scale-[0.98]"
+    >
+      <Check class="w-4 h-4" />
+      {t.confirmBtn}
+    </button>
+  </div>
+</dialog>
+
 <script>
   import { $ } from '@/utils/domSelector'
 
-  const $canvas = $<HTMLCanvasElement>('#drawSignCanvas') as HTMLCanvasElement
-  const ctx = $canvas.getContext('2d')!
+  // ── Shared sign pad factory ──────────────────────────────────────────────────
+  function createSignPad(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d')!
+    let paint = false
+    let clickX: number[] = []
+    let clickY: number[] = []
+    let clickDrag: boolean[] = []
+    let touchStartX = 0
+    let touchStartY = 0
 
-  const $signButton = $<HTMLButtonElement>('#sign')
-  const $signClearButton = $<HTMLButtonElement>('#signClear')
-  const $signImage = $<HTMLImageElement>('#signImage')
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    ctx.strokeStyle = '#ffffff'
+    ctx.lineWidth = 1.5
 
-  // Variables
-  let paint = false
-  let clickX: number[] = []
-  let clickY: number[] = []
-  let clickDrag: boolean[] = []
-
-  // Config
-  ctx.lineCap = 'round'
-  ctx.lineJoin = 'round'
-  ctx.strokeStyle = '#ffffff'
-  ctx.lineWidth = 1.5
-
-  function drawPlaceholder() {
-    const placeholder = $canvas.dataset.placeholder ?? 'Sign here'
-    ctx.save()
-    ctx.fillStyle = 'rgba(255,255,255,0.25)'
-    ctx.font = '13px Arial'
-    ctx.textAlign = 'center'
-    ctx.fillText(placeholder, $canvas.width / 2, $canvas.height / 2)
-    ctx.restore()
-  }
-
-  drawPlaceholder()
-
-  // Functions
-  function clearCanvas() {
-    ctx.clearRect(0, 0, $canvas.width, $canvas.height)
-    clickX = []
-    clickY = []
-    clickDrag = []
-  }
-
-  function redraw() {
-    for (let i = 0; i < clickX.length; ++i) {
-      ctx.beginPath()
-      if (clickDrag[i] && i) {
-        ctx.moveTo(clickX[i - 1], clickY[i - 1])
-      } else {
-        ctx.moveTo(clickX[i] - 1, clickY[i])
+    function getCoords(e: MouseEvent | TouchEvent) {
+      const rect = canvas.getBoundingClientRect()
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
+      const src = (e as TouchEvent).changedTouches
+        ? (e as TouchEvent).changedTouches[0]
+        : (e as MouseEvent)
+      return {
+        x: (src.clientX - rect.left) * scaleX,
+        y: (src.clientY - rect.top) * scaleY,
       }
-
-      ctx.lineTo(clickX[i], clickY[i])
-      ctx.stroke()
     }
-    ctx.closePath()
-  }
 
-  function addClick(x: number, y: number, dragging: boolean) {
-    clickX.push(x)
-    clickY.push(y)
-    clickDrag.push(dragging)
-  }
-
-  const clearEventHandler = () => {
-    clearCanvas()
-    drawPlaceholder()
-    $signImage.src = ''
-  }
-
-  const releaseEventHandler = () => {
-    paint = false
-    redraw()
-  }
-
-  const cancelEventHandler = () => {
-    paint = false
-  }
-
-  const pressEventHandler = (e: MouseEvent | TouchEvent) => {
-    const { mouseX, mouseY } = mouseAndTouchsEvents(e)
-
-    if (!paint && clickX.length === 0) {
-      ctx.clearRect(0, 0, $canvas.width, $canvas.height)
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      for (let i = 0; i < clickX.length; ++i) {
+        ctx.beginPath()
+        if (clickDrag[i] && i) {
+          ctx.moveTo(clickX[i - 1], clickY[i - 1])
+        } else {
+          ctx.moveTo(clickX[i] - 1, clickY[i])
+        }
+        ctx.lineTo(clickX[i], clickY[i])
+        ctx.stroke()
+      }
+      ctx.closePath()
     }
-    paint = true
-    addClick(mouseX, mouseY, false)
-    redraw()
-  }
 
-  const dragEventHandler = (e: MouseEvent | TouchEvent) => {
-    const { mouseX, mouseY } = mouseAndTouchsEvents(e)
-
-    if (paint) {
-      addClick(mouseX, mouseY, true)
+    const onDown = (e: MouseEvent | TouchEvent) => {
+      if ((e as TouchEvent).changedTouches) {
+        const t = (e as TouchEvent).changedTouches[0]
+        touchStartX = t.clientX
+        touchStartY = t.clientY
+        return
+      }
+      if (clickX.length === 0) ctx.clearRect(0, 0, canvas.width, canvas.height)
+      paint = true
+      const { x, y } = getCoords(e)
+      clickX.push(x); clickY.push(y); clickDrag.push(false)
       redraw()
     }
 
-    e.preventDefault()
-  }
-
-  const mouseAndTouchsEvents = (e: MouseEvent | TouchEvent) => {
-    const rect = $canvas.getBoundingClientRect()
-    const clientX = (e as TouchEvent).changedTouches
-      ? (e as TouchEvent).changedTouches[0].clientX
-      : (e as MouseEvent).clientX
-    const clientY = (e as TouchEvent).changedTouches
-      ? (e as TouchEvent).changedTouches[0].clientY
-      : (e as MouseEvent).clientY
-    return {
-      mouseX: clientX - rect.left,
-      mouseY: clientY - rect.top,
-    }
-  }
-
-  // EventListeners
-  $canvas.addEventListener('mousedown', pressEventHandler)
-  $canvas.addEventListener('mousemove', dragEventHandler)
-  $canvas.addEventListener('mouseup', releaseEventHandler)
-  $canvas.addEventListener('mouseout', cancelEventHandler)
-
-  $canvas.addEventListener('touchstart', pressEventHandler)
-  $canvas.addEventListener('touchmove', dragEventHandler)
-  $canvas.addEventListener('touchend', releaseEventHandler)
-  $canvas.addEventListener('touchcancel', cancelEventHandler)
-
-  $signClearButton.addEventListener('click', clearEventHandler)
-
-  function buildSignatureImage(): string | null {
-    if (clickX.length === 0) return null
-    const offscreen = document.createElement('canvas')
-    offscreen.width = $canvas.width
-    offscreen.height = $canvas.height
-    const offCtx = offscreen.getContext('2d')!
-    offCtx.strokeStyle = '#000000'
-    offCtx.lineCap = 'round'
-    offCtx.lineJoin = 'round'
-    offCtx.lineWidth = 1.5
-    for (let i = 0; i < clickX.length; i++) {
-      offCtx.beginPath()
-      if (clickDrag[i] && i) {
-        offCtx.moveTo(clickX[i - 1], clickY[i - 1])
-      } else {
-        offCtx.moveTo(clickX[i] - 1, clickY[i])
+    const onMove = (e: MouseEvent | TouchEvent) => {
+      if ((e as TouchEvent).changedTouches) {
+        const t = (e as TouchEvent).changedTouches[0]
+        const dx = t.clientX - touchStartX
+        const dy = t.clientY - touchStartY
+        if (!paint) {
+          if (Math.abs(dy) > Math.abs(dx) + 8) return
+          if (clickX.length === 0) ctx.clearRect(0, 0, canvas.width, canvas.height)
+          paint = true
+          const { x, y } = getCoords(e)
+          clickX.push(x); clickY.push(y); clickDrag.push(false)
+        } else {
+          const { x, y } = getCoords(e)
+          clickX.push(x); clickY.push(y); clickDrag.push(true)
+        }
+        redraw()
+        e.preventDefault()
+        return
       }
-      offCtx.lineTo(clickX[i], clickY[i])
-      offCtx.stroke()
+      if (paint) {
+        const { x, y } = getCoords(e)
+        clickX.push(x); clickY.push(y); clickDrag.push(true)
+        redraw()
+      }
     }
-    offCtx.closePath()
-    return offscreen.toDataURL('image/png')
+
+    const onUp = () => { paint = false; redraw() }
+    const onOut = () => { paint = false }
+
+    canvas.addEventListener('mousedown', onDown)
+    canvas.addEventListener('mousemove', onMove)
+    canvas.addEventListener('mouseup', onUp)
+    canvas.addEventListener('mouseout', onOut)
+    canvas.addEventListener('touchstart', onDown, { passive: true })
+    canvas.addEventListener('touchmove', onMove, { passive: false })
+    canvas.addEventListener('touchend', onUp)
+    canvas.addEventListener('touchcancel', onOut)
+
+    return {
+      drawPlaceholder(text: string) {
+        ctx.save()
+        ctx.fillStyle = 'rgba(255,255,255,0.25)'
+        ctx.font = '13px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2)
+        ctx.restore()
+      },
+      clear(placeholderText?: string) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        clickX = []; clickY = []; clickDrag = []
+        paint = false
+        if (placeholderText) this.drawPlaceholder(placeholderText)
+      },
+      isEmpty() { return clickX.length === 0 },
+      toDataUrl(): string | null {
+        if (this.isEmpty()) return null
+        const off = document.createElement('canvas')
+        off.width = canvas.width
+        off.height = canvas.height
+        const offCtx = off.getContext('2d')!
+        offCtx.strokeStyle = '#000000'
+        offCtx.lineCap = 'round'
+        offCtx.lineJoin = 'round'
+        offCtx.lineWidth = 1.5
+        for (let i = 0; i < clickX.length; i++) {
+          offCtx.beginPath()
+          if (clickDrag[i] && i) {
+            offCtx.moveTo(clickX[i - 1], clickY[i - 1])
+          } else {
+            offCtx.moveTo(clickX[i] - 1, clickY[i])
+          }
+          offCtx.lineTo(clickX[i], clickY[i])
+          offCtx.stroke()
+        }
+        offCtx.closePath()
+        return off.toDataURL('image/png')
+      },
+    }
   }
 
-  $signButton.addEventListener('click', () => {
-    const dataUrl = buildSignatureImage()
-    if (dataUrl !== null) {
-      $signImage.src = dataUrl
-    }
-  })
+  // ── Shared elements ──────────────────────────────────────────────────────────
+  const $signImage = $<HTMLImageElement>('#signImage')
+
+  // ── Desktop inline pad ───────────────────────────────────────────────────────
+  const $desktopCanvas = $<HTMLCanvasElement>('#drawSignCanvas')
+  if ($desktopCanvas) {
+    const pad = createSignPad($desktopCanvas)
+    pad.drawPlaceholder($desktopCanvas.dataset.placeholder ?? 'Sign here')
+
+    $<HTMLButtonElement>('#sign')?.addEventListener('click', () => {
+      const url = pad.toDataUrl()
+      if (url) $signImage.src = url
+    })
+
+    $<HTMLButtonElement>('#signClear')?.addEventListener('click', () => {
+      pad.clear($desktopCanvas.dataset.placeholder)
+      $signImage.removeAttribute('src')
+    })
+  }
+
+  // ── Mobile modal ─────────────────────────────────────────────────────────────
+  const $modal = $<HTMLDialogElement>('#signModal')
+  const $openBtn = $<HTMLButtonElement>('#openSignModal')
+  const $closeBtn = $<HTMLButtonElement>('#closeSignModal')
+  const $signBtnLabel = $<HTMLSpanElement>('#signBtnLabel')
+  const $modalCanvas = $<HTMLCanvasElement>('#signModalCanvas')
+  const $confirmBtn = $<HTMLButtonElement>('#signModalConfirm')
+  const $clearBtn = $<HTMLButtonElement>('#signModalClear')
+
+  if ($modal && $modalCanvas) {
+    const modalPad = createSignPad($modalCanvas)
+    modalPad.drawPlaceholder($modalCanvas.dataset.placeholder ?? 'Sign here')
+
+    $openBtn?.addEventListener('click', () => $modal.showModal())
+
+    $closeBtn?.addEventListener('click', () => $modal.close())
+
+    $clearBtn?.addEventListener('click', () => {
+      modalPad.clear($modalCanvas.dataset.placeholder)
+    })
+
+    $confirmBtn?.addEventListener('click', () => {
+      const url = modalPad.toDataUrl()
+      if (url) {
+        $signImage.src = url
+        // Update button to "signed" state
+        if ($openBtn && $signBtnLabel) {
+          $signBtnLabel.textContent = $openBtn.dataset.signed ?? ''
+          $openBtn.classList.remove('border-hawaii-steel', 'text-slate-300')
+          $openBtn.classList.add('border-amber-500/50', 'text-amber-400')
+        }
+      }
+      $modal.close()
+    })
+
+    // Close on backdrop click
+    $modal.addEventListener('click', (e) => {
+      const rect = $modal.getBoundingClientRect()
+      if (
+        e.clientX < rect.left || e.clientX > rect.right ||
+        e.clientY < rect.top  || e.clientY > rect.bottom
+      ) $modal.close()
+    })
+  }
 </script>
+
+<style>
+  .sign-dialog {
+    background: #0d1528;
+    border: 1px solid #1e3a5f;
+    border-radius: 0.75rem;
+    padding: 0;
+    width: calc(100% - 2rem);
+    max-width: 420px;
+    color: white;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  }
+
+  .sign-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+  }
+</style>
