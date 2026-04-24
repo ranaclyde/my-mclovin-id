@@ -6,6 +6,9 @@ interface Props {
 }
 
 const { t } = Astro.props
+
+const videoId = t.videoUrl.split('/embed/')[1]?.split('?')[0] ?? ''
+const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
 ---
 
 <section id="about" class="bg-hawaii-card py-16">
@@ -42,18 +45,64 @@ const { t } = Astro.props
         </div>
       </div>
 
-      <!-- Right: YouTube embed -->
-      <div data-animate class="opacity-0 animate-scale-in relative aspect-video rounded-xl overflow-hidden border border-hawaii-steel shadow-xl" style="animation-delay: 200ms">
-        <iframe
-          src={t.videoUrl}
-          title={t.videoTitle}
-          class="w-full h-full"
+      <!-- Right: YouTube facade (iframe loads only on click — no third-party cookies on initial load) -->
+      <div
+        data-animate
+        class="opacity-0 animate-scale-in relative aspect-video rounded-xl overflow-hidden border border-hawaii-steel shadow-xl cursor-pointer group"
+        style="animation-delay: 200ms"
+        data-yt-facade
+        data-video-id={videoId}
+        data-video-title={t.videoTitle}
+        role="button"
+        tabindex="0"
+        aria-label={t.videoTitle}
+      >
+        <img
+          src={thumbnailUrl}
+          alt={t.videoTitle}
+          class="absolute inset-0 w-full h-full object-cover"
           loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-        ></iframe>
+          decoding="async"
+          width="480"
+          height="360"
+        />
+        <div class="absolute inset-0 flex items-center justify-center bg-black/25 group-hover:bg-black/45 transition-colors">
+          <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </div>
       </div>
 
     </div>
   </div>
 </section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-yt-facade]').forEach((facade) => {
+    const load = () => {
+      const videoId = facade.dataset.videoId
+      const videoTitle = facade.dataset.videoTitle ?? ''
+      const iframe = document.createElement('iframe')
+      iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`
+      iframe.title = videoTitle
+      iframe.className = 'absolute inset-0 w-full h-full'
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+      iframe.allowFullscreen = true
+      facade.innerHTML = ''
+      facade.removeAttribute('role')
+      facade.removeAttribute('tabindex')
+      facade.classList.remove('cursor-pointer', 'group')
+      facade.appendChild(iframe)
+    }
+
+    facade.addEventListener('click', load)
+    facade.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        load()
+      }
+    })
+  })
+</script>
