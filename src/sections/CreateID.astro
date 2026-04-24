@@ -61,7 +61,7 @@ const { t } = Astro.props
         <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 100ms">
           <div class="flex gap-3 mb-5">
             <Input id="dob" type="date" label={t.dob} class="flex-auto" />
-            <Select id="sex" label={t.genre} options={t.genres} />
+            <Select id="sex" label={t.genre} placeholder={t.genrePlaceholder} options={t.genres} />
           </div>
         </div>
         <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 200ms">

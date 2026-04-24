@@ -38,6 +38,7 @@ export interface CreateIdTranslations {
   name: string
   dob: string
   genre: string
+  genrePlaceholder: string
   genres: GenreOption[]
   photo: PhotoTranslations
   sign: SignTranslations
@@ -104,6 +105,7 @@ export const translations: Record<string, FullTranslations> = {
       name: 'Nombre',
       dob: 'Fecha de nacimiento',
       genre: 'Género',
+      genrePlaceholder: 'Seleccioná una opción',
       genres: [
         { value: 'F', text: 'Femenino' },
         { value: 'M', text: 'Masculino' },
@@ -172,6 +174,7 @@ export const translations: Record<string, FullTranslations> = {
       name: 'Name',
       dob: 'Date of birth',
       genre: 'Gender',
+      genrePlaceholder: 'Select an option',
       genres: [
         { value: 'F', text: 'Female' },
         { value: 'M', text: 'Male' },
