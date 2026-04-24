@@ -1,54 +1,109 @@
-# Astro Starter Kit: Basics
+<div align="center">
 
-```sh
-npm create astro@latest -- --template basics
+# 🪪 My McLovin ID
+
+**Crea tu propia versión del ID más famoso del cine**
+
+[![Demo en vivo](https://img.shields.io/badge/Demo%20en%20vivo-mymclovinid.netlify.app-blue?style=for-the-badge&logo=netlify)](https://mymclovinid.netlify.app/)
+[![Astro](https://img.shields.io/badge/Astro-5.x-FF5D01?style=for-the-badge&logo=astro)](https://astro.build)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript)](https://typescriptlang.org)
+
+---
+
+![Screenshot de My McLovin ID](public/images/screenshot.jpg)
+
+</div>
+
+## ¿Qué es esto?
+
+Una webapp inspirada en el icónico ID falso de **Fogell / McLovin** de la película *Superbad* (2007). Completás tus datos, subís una foto, firmás y descargás tu propio documento estilo Hawaii — tal como haría McLovin.
+
+---
+
+## ✨ Funcionalidades
+
+- **Personalización en tiempo real** — el ID se renderiza en canvas mientras escribís
+- **Subida y recorte de foto** — con zoom y encuadre ajustable (powered by Croppie)
+- **Cámara integrada** — tomá una selfie directo desde el navegador
+- **Firma digital** — dibujá tu firma con el dedo o el mouse
+- **Exportar como PNG** — descargá el frente del ID con un click
+- **Exportar ZIP** — descargá frente y reverso juntos como `.zip`
+- **Soporte i18n** — disponible en Español e Inglés
+- **Diseño responsive** — funciona en mobile y desktop
+
+---
+
+## 🛠️ Stack tecnológico
+
+| Tecnología | Uso |
+|---|---|
+| [Astro 5](https://astro.build) | Framework principal (SSG, sin JS innecesario) |
+| [Tailwind CSS 3](https://tailwindcss.com) | Estilos utilitarios |
+| [TypeScript](https://typescriptlang.org) | Tipado estático en modo strict |
+| [Croppie](https://foliotek.github.io/Croppie/) | Recorte y zoom de la foto de perfil |
+| [JSZip](https://stuk.github.io/jszip/) | Exportación de ambas caras del ID en ZIP |
+| [Flowbite](https://flowbite.com) | Componentes UI (modales) |
+| [butterup-toast](https://github.com/Matth10/butterup) | Notificaciones toast |
+| [Netlify](https://netlify.com) | Hosting y deploy |
+
+---
+
+## 🚀 Desarrollo local
+
+**Requisitos:** Node.js 18+ y [pnpm](https://pnpm.io)
+
+```bash
+# Instalar dependencias
+pnpm install
+
+# Iniciar servidor de desarrollo en localhost:4321
+pnpm dev
+
+# Verificar tipos y compilar para producción
+pnpm build
+
+# Preview del build de producción
+pnpm preview
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+---
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🗂️ Estructura del proyecto
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   └── Card.astro
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+```
+src/
+├── pages/
+│   └── index.astro          # Página principal (single-page app)
+├── sections/
+│   ├── CreateID.astro        # Formulario y lógica de creación del ID
+│   ├── Hero.astro            # Sección hero
+│   └── About.astro           # Sección sobre McLovin
+├── components/
+│   ├── McLovinCanvas.astro   # Canvas que renderiza el ID en tiempo real
+│   ├── TakePhoto.astro       # Subida, recorte y cámara de foto
+│   └── Sign.astro            # Pad de firma digital
+├── i18n/
+│   └── translations.ts       # Textos en ES e EN
+├── const/
+│   └── mclovinData.ts        # Coordenadas de pixel para el canvas
+└── utils/
+    ├── domSelector.ts         # Shorthand tipado para querySelector
+    └── formattedDate.ts       # Formateo de fechas US MM/DD/YYYY
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+---
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## 🎬 El personaje
 
-Any static assets, like images, can be placed in the `public/` directory.
+> *"It's McLovin... just McLovin."*
 
-## 🧞 Commands
+McLovin es el alter ego de Fogell en *Superbad* (2007). Con un único nombre en su ID falso del Estado de Hawaii —sin apellido, sin dirección—, se convirtió en uno de los momentos más icónicos de la comedia de los 2000s.
 
-All commands are run from the root of the project, from a terminal:
+---
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+<div align="center">
 
-## 👀 Want to learn more?
+Hecho con ❤️ y demasiadas referencias a Superbad
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+</div>
