@@ -75,7 +75,15 @@ const { t } = Astro.props
     </div>
 
     <!-- Export button -->
-    <div class="text-center">
+    <div class="flex flex-col items-center gap-3">
+      <label class="flex items-center gap-2 cursor-pointer select-none text-slate-400 text-sm">
+        <input
+          id="exportBothSides"
+          type="checkbox"
+          class="w-4 h-4 rounded accent-hawaii-gold-light cursor-pointer"
+        />
+        {t.exportBothSides}
+      </label>
       <Button id="exportCanvas" size="lg" class="min-w-48">
         {t.export}
         <Download />
@@ -90,7 +98,15 @@ const { t } = Astro.props
 
   const $canvas = $<HTMLCanvasElement>('#mclovin-canvas')
   const $exportCanvasButton = $<HTMLButtonElement>('#exportCanvas')
+  const $exportBothSides = $<HTMLInputElement>('#exportBothSides')
   const $flipContainer = document.getElementById('flip-container')
+
+  function exportFrontOnly(): void {
+    const anchor = document.createElement('a')
+    anchor.href = $canvas.toDataURL('image/png')
+    anchor.download = 'my-mclovin-id.png'
+    anchor.click()
+  }
 
   async function exportZip(): Promise<void> {
     $exportCanvasButton.disabled = true
@@ -136,7 +152,13 @@ const { t } = Astro.props
     }
   }
 
-  $exportCanvasButton.onclick = exportZip
+  $exportCanvasButton.onclick = () => {
+    if ($exportBothSides.checked) {
+      exportZip()
+    } else {
+      exportFrontOnly()
+    }
+  }
 
   // --- Flip logic ---
   const $flipCard = $<HTMLButtonElement>('#flipCard')

@@ -34,6 +34,7 @@ export interface CreateIdTranslations {
   flipFront: string
   flipBack: string
   export: string
+  exportBothSides: string
   name: string
   dob: string
   genre: string
@@ -99,6 +100,7 @@ export const translations: Record<string, FullTranslations> = {
       flipFront: 'Ver frente',
       flipBack: 'Ver reverso',
       export: 'Exportar ID',
+      exportBothSides: 'Exportar también el reverso del ID (ZIP)',
       name: 'Nombre',
       dob: 'Fecha de nacimiento',
       genre: 'Género',
@@ -166,6 +168,7 @@ export const translations: Record<string, FullTranslations> = {
       flipFront: 'See front',
       flipBack: 'See back',
       export: 'Export ID',
+      exportBothSides: 'Also export the back of the ID (ZIP)',
       name: 'Name',
       dob: 'Date of birth',
       genre: 'Gender',
