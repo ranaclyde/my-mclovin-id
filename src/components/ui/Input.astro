@@ -18,27 +18,70 @@ const {
 } = Astro.props
 
 const isInputFile = type === 'file'
+const isInputDate = type === 'date'
 ---
 
 <div class:list={className}>
   <label class="block mb-2 text-sm font-medium text-white" for={id}>
     {label}
   </label>
-  <input
-    id={id}
-    type={type}
-    class:list={{
-      'p-2.5 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500': !isInputFile,
-      'p-2.5 cursor-pointer text-slate-400 focus:outline-none': isInputFile,
-    }}
-    class="block w-full text-base md:text-sm border rounded-lg bg-hawaii-input border-hawaii-steel placeholder-slate-500 transition-[border-color,box-shadow] duration-150 ease-in-out hover:border-amber-500"
-    required={isRequired}
-    {...otherProps}
-  />
+  <div class="relative">
+    <input
+      id={id}
+      type={type}
+      class:list={{
+        'h-12 px-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500': !isInputFile,
+        'p-2.5 cursor-pointer text-slate-400 focus:outline-none': isInputFile,
+        'pr-10': isInputDate,
+      }}
+      class="relative block w-full min-w-0 appearance-none text-base md:text-sm border rounded-lg bg-hawaii-input border-hawaii-steel placeholder-slate-500 transition-[border-color,box-shadow] duration-150 ease-in-out hover:border-amber-500"
+      required={isRequired}
+      {...otherProps}
+    />
+    {
+      isInputDate && (
+        <svg
+          class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
+    }
+  </div>
 </div>
 
 <style>
   input {
     color-scheme: dark;
+  }
+
+  /* iOS WebKit gives date inputs an intrinsic min-width and native chrome,
+     which overflows narrow columns and changes the height */
+  input[type='date'] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type='date']::-webkit-date-and-time-value {
+    text-align: left;
+    margin: 0;
+  }
+
+  /* Hide the native picker icon but keep it as a full-size hit area, so a
+     click anywhere opens the picker and our own icon shows in every browser */
+  input[type='date']::-webkit-calendar-picker-indicator {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    cursor: pointer;
   }
 </style>
