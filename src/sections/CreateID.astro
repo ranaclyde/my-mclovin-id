@@ -15,29 +15,30 @@ interface Props {
 const { t } = Astro.props
 ---
 
-<section id="createid-section" class="bg-hawaii-navy py-16">
+<section
+  id="createid-section"
+  class="bg-hawaii-navy py-16"
+  data-feedback={JSON.stringify(t.feedback)}
+>
   <div class="mx-auto w-full max-w-screen-lg px-4 md:px-6">
 
     <!-- Section header -->
     <div data-animate class="opacity-0 animate-fade-in text-center mb-10">
-      <span class="inline-block text-xs tracking-[0.3em] uppercase text-hawaii-blue-light border border-hawaii-steel rounded-full px-3 py-1 mb-4">
-        {t.badge}
-      </span>
-      <h2 class="text-3xl font-bold text-hawaii-gold-light mt-3">
+      <h2 class="text-3xl font-bold text-hawaii-gold-light text-balance">
         {t.title}
       </h2>
-      <p class="text-slate-400 mt-2">
+      <p class="text-slate-400 mt-3 text-pretty">
         {t.subtitle}
       </p>
     </div>
 
-    <!-- Main layout: form left, canvas right on desktop; form on top on mobile -->
-    <div class="flex flex-col-reverse md:flex-row gap-6 mb-8">
+    <!-- Main layout: canvas left, form right on desktop; preview on top on mobile so edits are visible -->
+    <div class="flex flex-col md:flex-row gap-6 mb-8">
 
       <!-- Canvas / Preview column -->
       <div data-animate class="opacity-0 animate-scale-in w-full md:w-auto flex flex-col items-center gap-4">
         <!-- Interactive canvas -->
-        <McLovinCanvas />
+        <McLovinCanvas label={t.canvasLabel} />
 
         <!-- Botón flip, visible solo en md+ (donde el canvas es visible) -->
         <Button
@@ -56,11 +57,11 @@ const { t } = Astro.props
       <!-- Form column -->
       <form id="form" class="w-full">
         <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 0ms">
-          <Input id="name" label={t.name} class="mb-5" maxlength="15" />
+          <Input id="name" label={t.name} class="mb-5" maxlength="15" placeholder="McLOVIN" autocomplete="off" />
         </div>
         <div data-animate class="opacity-0 animate-slide-up" style="animation-delay: 100ms">
           <div class="flex gap-3 mb-5">
-            <Input id="dob" type="date" label={t.dob} class="flex-1 min-w-0" />
+            <Input id="dob" type="date" label={t.dob} class="flex-1 min-w-0" min="1900-01-01" />
             <Select id="sex" label={t.genre} placeholder={t.genrePlaceholder} options={t.genres} class="flex-1 min-w-0" />
           </div>
         </div>
@@ -76,7 +77,7 @@ const { t } = Astro.props
 
     <!-- Export button -->
     <div class="flex flex-col items-center gap-3">
-      <label class="flex items-center gap-2 cursor-pointer select-none text-slate-400 text-sm">
+      <label class="flex min-h-11 items-center gap-2 px-2 cursor-pointer select-none text-slate-400 hover:text-slate-300 text-sm transition-colors">
         <input
           id="exportBothSides"
           type="checkbox"
@@ -84,79 +85,128 @@ const { t } = Astro.props
         />
         {t.exportBothSides}
       </label>
-      <Button id="exportCanvas" size="lg" class="min-w-48">
+      <Button
+        id="exportCanvas"
+        size="lg"
+        class="min-w-48"
+        aria-describedby="exportDisclaimer"
+        data-flipped-hint={t.exportDisabledFlipped}
+      >
         {t.export}
         <Download />
       </Button>
+      <p id="exportDisclaimer" class="max-w-md text-center text-sm text-slate-400 text-pretty mt-2">
+        {t.disclaimer}
+      </p>
     </div>
   </div>
 </section>
 
 <script>
   import { $ } from '@/utils/domSelector'
+  import { notify } from '@/utils/toast'
+  import type { ExportFeedbackTranslations } from '@/i18n/translations'
   import JSZip from 'jszip'
 
+  const $section = $('#createid-section')
   const $canvas = $<HTMLCanvasElement>('#mclovin-canvas')
   const $exportCanvasButton = $<HTMLButtonElement>('#exportCanvas')
   const $exportBothSides = $<HTMLInputElement>('#exportBothSides')
   const $flipContainer = document.getElementById('flip-container')
+  const $dob = $<HTMLInputElement>('#dob')
 
-  function exportFrontOnly(): void {
+  const feedback = JSON.parse($section.dataset.feedback ?? '{}') as ExportFeedbackTranslations
+
+  // No future birthdays; set here so a static build doesn't freeze the date
+  const today = new Date()
+  $dob.max = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, '0'),
+    String(today.getDate()).padStart(2, '0'),
+  ].join('-')
+
+  let isExporting = false
+
+  function download(href: string, filename: string): void {
     const anchor = document.createElement('a')
-    anchor.href = $canvas.toDataURL('image/png')
-    anchor.download = 'my-mclovin-id.png'
+    anchor.href = href
+    anchor.download = filename
+    // Firefox ignores clicks on detached anchors
+    anchor.style.display = 'none'
+    document.body.appendChild(anchor)
     anchor.click()
+    anchor.remove()
+  }
+
+  function canvasToBlob(): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      $canvas.toBlob((blob) => {
+        if (blob) resolve(blob)
+        else reject(new Error('Canvas export returned no data'))
+      }, 'image/png')
+    })
+  }
+
+  function downloadBlob(blob: Blob, filename: string): void {
+    const objectUrl = URL.createObjectURL(blob)
+    download(objectUrl, filename)
+    // Revoking right away can cancel the download in Safari and Firefox
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 10_000)
+  }
+
+  async function exportFrontOnly(): Promise<void> {
+    downloadBlob(await canvasToBlob(), 'my-mclovin-id.png')
   }
 
   async function exportZip(): Promise<void> {
-    $exportCanvasButton.disabled = true
+    const zip = new JSZip()
+    zip.file('mclovin-id-front.png', await canvasToBlob())
+
+    let backSkipped = false
     try {
-      const frontDataUrl = $canvas.toDataURL('image/png')
-      const base64 = frontDataUrl.split(',')[1]
-      const binary = atob(base64)
-      const frontBytes = new Uint8Array(binary.length)
-      for (let i = 0; i < binary.length; i++) {
-        frontBytes[i] = binary.charCodeAt(i)
-      }
+      const res = await fetch('/images/mclovin-id-back.webp')
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      zip.file('mclovin-id-back.webp', await res.arrayBuffer())
+    } catch {
+      backSkipped = true
+    }
 
-      const zip = new JSZip()
-      zip.file('mclovin-id-front.png', frontBytes)
+    const blob = await zip.generateAsync({ type: 'blob' })
+    downloadBlob(blob, 'my-mclovin-id.zip')
 
-      try {
-        const res = await fetch('/images/mclovin-id-back.webp')
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const backBuf = await res.arrayBuffer()
-        zip.file('mclovin-id-back.webp', backBuf)
-      } catch {
-        window.toast?.({
-          type: 'warning',
-          title: 'Back side skipped',
-          message: 'Could not include the ID back. Exporting front only.',
-        })
-      }
-
-      const blob = await zip.generateAsync({ type: 'blob' })
-      const anchor = document.createElement('a')
-      const objectUrl = URL.createObjectURL(blob)
-      anchor.href = objectUrl
-      anchor.download = 'my-mclovin-id.zip'
-      anchor.click()
-      URL.revokeObjectURL(objectUrl)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      window.toast?.({ type: 'error', title: 'Export failed', message })
-    } finally {
-      if (!$flipContainer?.classList.contains('is-flipped')) {
-        $exportCanvasButton.disabled = false
-      }
+    if (backSkipped) {
+      notify({ type: 'warning', title: feedback.backSkippedTitle, message: feedback.backSkippedMessage })
     }
   }
 
-  $exportCanvasButton.onclick = () => {
-    if ($exportBothSides.checked) {
-      exportZip()
-    } else {
-      exportFrontOnly()
+  function setExportDisabled(disabled: boolean): void {
+    $exportCanvasButton.disabled = disabled
+    $exportCanvasButton.setAttribute('aria-busy', String(isExporting))
+  }
+
+  $exportCanvasButton.onclick = async () => {
+    if (isExporting) return
+
+    // The empty template hasn't loaded yet: exporting now would give a blank PNG
+    if ($canvas.dataset.ready !== 'true') {
+      notify({ type: 'info', title: feedback.notReadyTitle, message: feedback.notReadyMessage })
+      return
+    }
+
+    isExporting = true
+    setExportDisabled(true)
+    try {
+      if ($exportBothSides.checked) {
+        await exportZip()
+      } else {
+        await exportFrontOnly()
+      }
+      notify({ type: 'success', title: feedback.successTitle, message: feedback.successMessage })
+    } catch {
+      notify({ type: 'error', title: feedback.errorTitle, message: feedback.errorMessage })
+    } finally {
+      isExporting = false
+      setExportDisabled(!!$flipContainer?.classList.contains('is-flipped'))
     }
   }
 
@@ -169,7 +219,9 @@ const { t } = Astro.props
       $flipCard.textContent = isFlipped
         ? ($flipCard.dataset.front ?? '')
         : ($flipCard.dataset.back ?? '')
-      $exportCanvasButton.disabled = isFlipped
+      $flipCard.setAttribute('aria-pressed', String(isFlipped))
+      $exportCanvasButton.title = isFlipped ? ($exportCanvasButton.dataset.flippedHint ?? '') : ''
+      if (!isExporting) setExportDisabled(isFlipped)
     })
   }
 </script>
