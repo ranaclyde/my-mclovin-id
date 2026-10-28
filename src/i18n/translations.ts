@@ -15,6 +15,12 @@ export interface PhotoTranslations {
   cameraTitle: string
   cameraSubtitle: string
   cameraCaptureBtn: string
+  previewAlt: string
+  errorTitle: string
+  errorType: string
+  errorRead: string
+  errorCameraDenied: string
+  errorCamera: string
 }
 
 export interface SignTranslations {
@@ -27,6 +33,17 @@ export interface SignTranslations {
   confirmBtn: string
   clearBtn: string
   close: string
+}
+
+export interface ExportFeedbackTranslations {
+  successTitle: string
+  successMessage: string
+  notReadyTitle: string
+  notReadyMessage: string
+  backSkippedTitle: string
+  backSkippedMessage: string
+  errorTitle: string
+  errorMessage: string
 }
 
 export interface GenreOption {
@@ -42,6 +59,10 @@ export interface CreateIdTranslations {
   flipBack: string
   export: string
   exportBothSides: string
+  exportDisabledFlipped: string
+  disclaimer: string
+  canvasLabel: string
+  feedback: ExportFeedbackTranslations
   name: string
   dob: string
   genre: string
@@ -109,6 +130,20 @@ export const translations: Record<string, FullTranslations> = {
       flipBack: 'Ver reverso',
       export: 'Exportar ID',
       exportBothSides: 'Exportar también el reverso del ID (ZIP)',
+      exportDisabledFlipped: 'Volvé al frente para exportar',
+      disclaimer:
+        'Parodia de fans de Superbad. No es un documento real ni sirve como identificación. Tu foto, tu firma y tus datos nunca salen de tu navegador.',
+      canvasLabel: 'Vista previa de tu ID de McLovin',
+      feedback: {
+        successTitle: 'Listo, McLovin',
+        successMessage: 'Tu ID ya se está descargando.',
+        notReadyTitle: 'Un segundo…',
+        notReadyMessage: 'El ID todavía se está cargando. Probá de nuevo en un momento.',
+        backSkippedTitle: 'Sin reverso',
+        backSkippedMessage: 'No pudimos agregar el reverso, así que descargaste solo el frente.',
+        errorTitle: 'No se pudo exportar',
+        errorMessage: 'Algo falló al armar la imagen. Probá de nuevo.',
+      },
       name: 'Nombre',
       dob: 'Fecha de nacimiento',
       genre: 'Género',
@@ -135,6 +170,13 @@ export const translations: Record<string, FullTranslations> = {
         cameraTitle: 'Tomá una foto',
         cameraSubtitle: 'Posicioná tu cara y capturá cuando estés listo',
         cameraCaptureBtn: 'Capturar foto',
+        previewAlt: 'Tu foto recortada',
+        errorTitle: 'No pudimos usar esa foto',
+        errorType: 'Ese archivo no es una imagen compatible. Usá una foto JPG, PNG o WEBP.',
+        errorRead: 'No pudimos abrir esa imagen. Probá con otra foto.',
+        errorCameraDenied:
+          'No tenemos permiso para usar la cámara. Habilitalo en tu navegador o subí una foto.',
+        errorCamera: 'No pudimos abrir la cámara. Subí una foto desde tu galería.',
       },
       sign: {
         label: 'Firma',
@@ -185,6 +227,20 @@ export const translations: Record<string, FullTranslations> = {
       flipBack: 'See back',
       export: 'Export ID',
       exportBothSides: 'Also export the back of the ID (ZIP)',
+      exportDisabledFlipped: 'Flip back to the front to export',
+      disclaimer:
+        'A Superbad fan parody. Not a real document and not valid as identification. Your photo, signature and details never leave your browser.',
+      canvasLabel: 'Preview of your McLovin ID',
+      feedback: {
+        successTitle: 'Done, McLovin',
+        successMessage: 'Your ID is downloading.',
+        notReadyTitle: 'One sec…',
+        notReadyMessage: 'The ID is still loading. Try again in a moment.',
+        backSkippedTitle: 'Back side skipped',
+        backSkippedMessage: "We couldn't add the back, so you got the front only.",
+        errorTitle: "Couldn't export",
+        errorMessage: 'Something went wrong building the image. Please try again.',
+      },
       name: 'Name',
       dob: 'Date of birth',
       genre: 'Gender',
@@ -211,6 +267,13 @@ export const translations: Record<string, FullTranslations> = {
         cameraTitle: 'Take a photo',
         cameraSubtitle: 'Position your face and capture when ready',
         cameraCaptureBtn: 'Capture photo',
+        previewAlt: 'Your cropped photo',
+        errorTitle: "Couldn't use that photo",
+        errorType: "That file isn't a supported image. Use a JPG, PNG or WEBP photo.",
+        errorRead: "We couldn't open that image. Try another photo.",
+        errorCameraDenied:
+          "We don't have permission to use the camera. Allow it in your browser or upload a photo.",
+        errorCamera: "We couldn't open the camera. Upload a photo from your gallery instead.",
       },
       sign: {
         label: 'Signature',

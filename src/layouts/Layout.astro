@@ -83,10 +83,33 @@ const jsonLd = {
     scroll-behavior: smooth;
   }
 
-  .butteruptoast.dark {
-    font-size: 21px;
-    padding: 15px 20px;
+  /* Toasts themed from the hawaii palette */
+  .toaster.bottom-center {
+    width: calc(100% - 2rem);
+    max-width: 360px;
   }
+
+  .butteruptoast.mclovin {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 14px;
+    background-color: #0d1528;
+    border: 1px solid #1e3a5f;
+    color: #ffffff;
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7);
+  }
+
+  .butteruptoast.mclovin .message {
+    color: #cbd5e1;
+  }
+
+  .butteruptoast.mclovin.success { border-color: rgba(251, 191, 36, 0.5); }
+  .butteruptoast.mclovin.success .icon svg { fill: #fbbf24; }
+  .butteruptoast.mclovin.warning { border-color: rgba(245, 158, 11, 0.5); }
+  .butteruptoast.mclovin.warning .icon svg { fill: #f59e0b; }
+  .butteruptoast.mclovin.error { border-color: rgba(248, 113, 113, 0.55); }
+  .butteruptoast.mclovin.error .icon svg { fill: #f87171; }
+  .butteruptoast.mclovin.info .icon svg { fill: #38bdf8; }
 
   /* Animaciones on-scroll */
   [data-animate] {

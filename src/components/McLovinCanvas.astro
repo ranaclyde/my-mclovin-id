@@ -1,3 +1,11 @@
+---
+interface Props {
+  label: string
+}
+
+const { label } = Astro.props
+---
+
 <div class="relative w-full max-w-[527px]">
   <div
     class="hidden lg:block w-[527px] h-[326px] bg-amber-400 absolute -z-[1] blur-md opacity-20"
@@ -14,6 +22,8 @@
       <div class="flip-face">
         <canvas
           id="mclovin-canvas"
+          role="img"
+          aria-label={label}
           class="w-full h-full lg:w-[527px] lg:h-[326px] rounded-md bg-transparent border border-hawaii-steel"
           width="527"
           height="326"
@@ -35,21 +45,21 @@
   <img
     hidden
     id="mcLovinID"
-    src="images/mclovin-empty-id.webp"
+    src="/images/mclovin-empty-id.webp"
     alt="Empty McLovin ID"
   />
 
   <img
     hidden
     id="mcLovinFace"
-    src="images/mclovin-face.webp"
+    src="/images/mclovin-face.webp"
     alt="McLovin Face ID"
   />
 
   <img
     hidden
     id="mcLovinSign"
-    src="images/mclovin-sign.webp"
+    src="/images/mclovin-sign.webp"
     alt="McLovin Sign"
   />
 </div>
@@ -116,40 +126,66 @@
   const $photo = $<HTMLImageElement>('#croppedImage')
   const $signImage = $<HTMLImageElement>('#signImage')
 
+  // The name sits under the barcode; wider text gets squeezed instead of
+  // running into the signature area.
+  const NAME_MAX_WIDTH = 185
+
   $('#form').addEventListener('input', function () {
     drawCanvas()
   })
 
-  $photo?.addEventListener('load', () => {
+  // Fired by components that change an image without triggering a load event
+  // (e.g. clearing the signature).
+  document.addEventListener('mclovin:redraw', () => {
     drawCanvas()
   })
 
-  $signImage?.addEventListener('load', () => {
-    drawCanvas()
+  // Redraw as each image finishes loading, including the base assets, which
+  // may still be in flight when this script first runs.
+  ;[$mcLovinID, $mcLovinFace, $mcLovinSign, $photo, $signImage].forEach(($img) => {
+    $img?.addEventListener('load', () => {
+      drawCanvas()
+    })
   })
+
+  // drawImage throws on a broken image and draws nothing on a pending one
+  function isReady($img: HTMLImageElement | null): $img is HTMLImageElement {
+    return !!$img?.getAttribute('src') && $img.complete && $img.naturalWidth > 0
+  }
 
   function drawCanvas() {
     // Clean canvas
     ctx.clearRect(0, 0, $canvas.width, $canvas.height)
     // Draw empty ID
-    ctx.drawImage($mcLovinID, 0, 0, $canvas.width, $canvas.height)
+    if (isReady($mcLovinID)) {
+      ctx.drawImage($mcLovinID, 0, 0, $canvas.width, $canvas.height)
+    }
+    $canvas.dataset.ready = String(isReady($mcLovinID))
+
     // Draw McLovin photo
-    ctx.drawImage(
-      !!$photo?.src ? $photo : $mcLovinFace,
-      mclovin.photo.posX / 3,
-      mclovin.photo.posY / 3,
-      $mcLovinFace.width / 3,
-      $mcLovinFace.height / 3
-    )
+    const photo = isReady($photo) ? $photo : $mcLovinFace
+    if (isReady(photo) && isReady($mcLovinFace)) {
+      ctx.drawImage(
+        photo,
+        mclovin.photo.posX / 3,
+        mclovin.photo.posY / 3,
+        $mcLovinFace.naturalWidth / 3,
+        $mcLovinFace.naturalHeight / 3
+      )
+    }
     // Draw McLovin sign
-    const signSize = !!$signImage?.src ? 3 : 4
-    ctx.drawImage(
-      !!$signImage?.src ? $signImage : $mcLovinSign,
-      mclovin.sign.posX / 3,
-      mclovin.sign.posY / 3,
-      $mcLovinSign.width / signSize,
-      $mcLovinSign.height / signSize
-    )
+    const hasCustomSign = isReady($signImage)
+    const sign = hasCustomSign ? $signImage : $mcLovinSign
+    const signSize = hasCustomSign ? 3 : 4
+    if (isReady(sign) && isReady($mcLovinSign)) {
+      ctx.drawImage(
+        sign,
+        mclovin.sign.posX / 3,
+        mclovin.sign.posY / 3,
+        $mcLovinSign.naturalWidth / signSize,
+        $mcLovinSign.naturalHeight / signSize
+      )
+    }
 
     ctx.font = `bold ${fontSize.title / 3}px Arial`
     // DOB
@@ -166,9 +202,10 @@
     )
     // NAME
     ctx.fillText(
-      $name?.value || mclovin.name.value,
+      $name?.value.trim() || mclovin.name.value,
       mclovin.name.posX / 3,
-      mclovin.name.posY / 3
+      mclovin.name.posY / 3,
+      NAME_MAX_WIDTH
     )
 
     ctx.font = `bold ${fontSize.subtitle / 3}px Arial`
@@ -186,13 +223,20 @@
     )
   }
 
+  function isLeapYear(year: number) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+  }
+
   function updateExpDate() {
     if (!$dob.value) return
     const dobDate = formattedDate($dob.value)
     const extractDate = dobDate?.split('/')
     if (!extractDate) return
     const year = new Date().getFullYear() + 10
-    return `${extractDate[0]}/${extractDate[1]}/${year}`
+    const [month, day] = extractDate
+    // A Feb 29 birthday expires on Feb 28 when the expiry year isn't leap
+    const expDay = month === '02' && day === '29' && !isLeapYear(year) ? '28' : day
+    return `${month}/${expDay}/${year}`
   }
 
   drawCanvas()

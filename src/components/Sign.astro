@@ -40,10 +40,10 @@ const { t } = Astro.props
       data-placeholder={t.placeholder}
     ></canvas>
     <div class="flex flex-col gap-1">
-      <Button id="sign" size="xs" shape="pill" color="success" desc="Sign" isOnlyIcon>
+      <Button id="sign" size="xs" shape="pill" color="success" desc={t.confirmBtn} isOnlyIcon>
         <Check />
       </Button>
-      <Button id="signClear" size="xs" shape="pill" color="info" desc="Reload Sign" isOnlyIcon>
+      <Button id="signClear" size="xs" shape="pill" color="info" desc={t.clearBtn} isOnlyIcon>
         <Reload />
       </Button>
     </div>
@@ -51,7 +51,7 @@ const { t } = Astro.props
 </div>
 
 <!-- Hidden image read by McLovinCanvas (always in DOM) -->
-<img hidden alt="McLovin Sign" id="signImage" height="120" width="auto" />
+<img hidden alt="" id="signImage" height="120" width="auto" />
 
 <!-- Sign modal (mobile) -->
 <dialog id="signModal" class="sign-dialog">
@@ -118,7 +118,7 @@ const { t } = Astro.props
   import { $ } from '@/utils/domSelector'
 
   // ── Shared sign pad factory ──────────────────────────────────────────────────
-  function createSignPad(canvas: HTMLCanvasElement) {
+  function createSignPad(canvas: HTMLCanvasElement, onStrokeEnd?: () => void) {
     const ctx = canvas.getContext('2d')!
     let paint = false
     let clickX: number[] = []
@@ -200,8 +200,17 @@ const { t } = Astro.props
       }
     }
 
-    const onUp = () => { paint = false; redraw() }
-    const onOut = () => { paint = false }
+    const onUp = () => {
+      const wasPainting = paint
+      paint = false
+      redraw()
+      if (wasPainting) onStrokeEnd?.()
+    }
+    const onOut = () => {
+      const wasPainting = paint
+      paint = false
+      if (wasPainting) onStrokeEnd?.()
+    }
 
     canvas.addEventListener('mousedown', onDown)
     canvas.addEventListener('mousemove', onMove)
@@ -257,20 +266,29 @@ const { t } = Astro.props
   // ── Shared elements ──────────────────────────────────────────────────────────
   const $signImage = $<HTMLImageElement>('#signImage')
 
+  // Removing the src fires no load event, so ask the ID canvas to redraw
+  function removeSignature() {
+    $signImage.removeAttribute('src')
+    document.dispatchEvent(new Event('mclovin:redraw'))
+  }
+
   // ── Desktop inline pad ───────────────────────────────────────────────────────
   const $desktopCanvas = $<HTMLCanvasElement>('#drawSignCanvas')
   if ($desktopCanvas) {
-    const pad = createSignPad($desktopCanvas)
-    pad.drawPlaceholder($desktopCanvas.dataset.placeholder ?? 'Sign here')
-
-    $<HTMLButtonElement>('#sign')?.addEventListener('click', () => {
+    function applySignature() {
       const url = pad.toDataUrl()
       if (url) $signImage.src = url
-    })
+    }
+
+    // Apply after every stroke so an export never misses an unconfirmed signature
+    const pad = createSignPad($desktopCanvas, applySignature)
+    pad.drawPlaceholder($desktopCanvas.dataset.placeholder ?? 'Sign here')
+
+    $<HTMLButtonElement>('#sign')?.addEventListener('click', applySignature)
 
     $<HTMLButtonElement>('#signClear')?.addEventListener('click', () => {
       pad.clear($desktopCanvas.dataset.placeholder)
-      $signImage.removeAttribute('src')
+      removeSignature()
     })
   }
 
@@ -295,17 +313,24 @@ const { t } = Astro.props
       modalPad.clear($modalCanvas.dataset.placeholder)
     })
 
+    function setSignedState(signed: boolean) {
+      if (!$openBtn || !$signBtnLabel) return
+      $signBtnLabel.textContent = (signed ? $openBtn.dataset.signed : $openBtn.dataset.empty) ?? ''
+      $openBtn.classList.toggle('border-hawaii-steel', !signed)
+      $openBtn.classList.toggle('text-slate-300', !signed)
+      $openBtn.classList.toggle('border-amber-500/50', signed)
+      $openBtn.classList.toggle('text-amber-400', signed)
+    }
+
     $confirmBtn?.addEventListener('click', () => {
       const url = modalPad.toDataUrl()
       if (url) {
         $signImage.src = url
-        // Update button to "signed" state
-        if ($openBtn && $signBtnLabel) {
-          $signBtnLabel.textContent = $openBtn.dataset.signed ?? ''
-          $openBtn.classList.remove('border-hawaii-steel', 'text-slate-300')
-          $openBtn.classList.add('border-amber-500/50', 'text-amber-400')
-        }
+      } else {
+        // Cleared and saved: fall back to McLovin's signature
+        removeSignature()
       }
+      setSignedState(!!url)
       $modal.close()
     })
 

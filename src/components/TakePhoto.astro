@@ -54,6 +54,11 @@ const { t } = Astro.props
   data-confirm-subtitle={t.confirmSubtitle}
   data-camera-title={t.cameraTitle}
   data-camera-subtitle={t.cameraSubtitle}
+  data-error-title={t.errorTitle}
+  data-error-type={t.errorType}
+  data-error-read={t.errorRead}
+  data-error-camera-denied={t.errorCameraDenied}
+  data-error-camera={t.errorCamera}
 >
   <!-- Gold accent bar -->
   <div class="h-1 w-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 rounded-t-xl"></div>
@@ -108,7 +113,7 @@ const { t } = Astro.props
     <div id="previewView" class="hidden flex-col items-center gap-3">
       <img
         id="croppedImage"
-        alt="Imagen recortada"
+        alt={t.previewAlt}
         width="170"
         height="208"
         class="rounded-lg border-2 border-amber-500/50 block"
@@ -121,7 +126,8 @@ const { t } = Astro.props
       <button
         id="btnCapture"
         type="button"
-        class="hidden flex-1 items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-hawaii-navy font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+        disabled
+        class="hidden flex-1 disabled:opacity-40 disabled:pointer-events-none items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-hawaii-navy font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3" />
@@ -133,7 +139,7 @@ const { t } = Astro.props
       <button
         id="btnCrop"
         type="button"
-        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-hawaii-navy font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+        class="disabled:opacity-40 disabled:pointer-events-none flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-hawaii-navy font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
       >
         <Check class="w-4 h-4" />
         {t.cropBtn}
@@ -164,6 +170,7 @@ const { t } = Astro.props
 <script>
   import Croppie from 'croppie'
   import { $ } from '@/utils/domSelector'
+  import { notify } from '@/utils/toast'
 
   const dialog = $<HTMLDialogElement>('#cropImgModal')
   const $upload = $<HTMLInputElement>('#upload')
@@ -266,12 +273,39 @@ const { t } = Astro.props
     $modalSubtitle.textContent = dialog.dataset.confirmSubtitle ?? ''
   }
 
+  function showError(message: string | undefined) {
+    if (!message) return
+    notify({ type: 'error', title: dialog.dataset.errorTitle ?? '', message })
+  }
+
+  // Croppie rejects when the browser can't decode the image (corrupt file,
+  // HEIC renamed to .jpg, ...)
+  function bindToCroppie(url: string) {
+    $btnCrop.disabled = true
+    Promise.resolve(croppie.bind({ url }))
+      .then(() => {
+        $btnCrop.disabled = false
+      })
+      .catch(() => {
+        $btnCrop.disabled = false
+        closeDialog()
+        showError(dialog.dataset.errorRead)
+      })
+  }
+
   $upload?.addEventListener('change', (e) => {
     const target = e.target as HTMLInputElement
-    const file = (target.files as FileList)[0]
-    const allowed = ['image/png', 'image/jpeg', 'image/webp']
+    const file = target.files?.[0]
+    // Clear right away so picking the same file again still fires `change`
+    target.value = ''
+    // Picker dismissed without a choice
+    if (!file) return
 
-    if (!allowed.includes(file.type)) return
+    const allowed = ['image/png', 'image/jpeg', 'image/webp']
+    if (!allowed.includes(file.type)) {
+      showError(dialog.dataset.errorType)
+      return
+    }
 
     if ($uploadLabel) $uploadLabel.textContent = file.name
     showCropView()
@@ -279,25 +313,43 @@ const { t } = Astro.props
 
     const reader = new FileReader()
     reader.onload = (ev) => {
-      croppie.bind({ url: ev.target?.result as string })
+      bindToCroppie(ev.target?.result as string)
+    }
+    reader.onerror = () => {
+      closeDialog()
+      showError(dialog.dataset.errorRead)
     }
     reader.readAsDataURL(file)
   })
 
+  $cameraVideo?.addEventListener('loadedmetadata', () => {
+    $btnCapture.disabled = false
+  })
+
   $cameraBtn?.addEventListener('click', async () => {
-    $upload.value = ''
     if ($uploadLabel) $uploadLabel.textContent = uploadPlaceholder
     showCameraView()
+    $btnCapture.disabled = true
     dialog.showModal()
     try {
+      // Unavailable outside secure contexts (plain http)
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error('getUserMedia unavailable')
       cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+      // The dialog may have been closed while the permission prompt was open
+      if (!dialog.open) {
+        stopStream()
+        return
+      }
       $cameraVideo.srcObject = cameraStream
-    } catch {
+    } catch (err) {
       closeDialog()
+      const denied = err instanceof DOMException && err.name === 'NotAllowedError'
+      showError(denied ? dialog.dataset.errorCameraDenied : dialog.dataset.errorCamera)
     }
   })
 
   $btnCapture?.addEventListener('click', () => {
+    if (!$cameraVideo.videoWidth) return
     const canvas = document.createElement('canvas')
     canvas.width = $cameraVideo.videoWidth
     canvas.height = $cameraVideo.videoHeight
@@ -305,15 +357,16 @@ const { t } = Astro.props
     const dataUrl = canvas.toDataURL('image/jpeg')
     stopStream()
     showCropView()
-    croppie.bind({ url: dataUrl })
+    bindToCroppie(dataUrl)
   })
+
+  function hasPhoto() {
+    return !!$croppedImage.getAttribute('src')
+  }
 
   function closeDialog() {
     stopStream()
-    if (!$croppedImage.src || $croppedImage.src === window.location.href) {
-      $upload.value = ''
-      if ($uploadLabel) $uploadLabel.textContent = uploadPlaceholder
-    }
+    if (!hasPhoto() && $uploadLabel) $uploadLabel.textContent = uploadPlaceholder
     dialog.close()
   }
 
@@ -334,17 +387,24 @@ const { t } = Astro.props
   // Escape ya es manejado nativamente por <dialog>
   dialog?.addEventListener('cancel', () => {
     stopStream()
-    if (!$croppedImage.src || $croppedImage.src === window.location.href) {
-      $upload.value = ''
-      if ($uploadLabel) $uploadLabel.textContent = uploadPlaceholder
-    }
+    if (!hasPhoto() && $uploadLabel) $uploadLabel.textContent = uploadPlaceholder
   })
 
   $btnCrop?.addEventListener('click', () => {
-    croppie.result('canvas').then((result: string) => {
-      $croppedImage.src = result
-      showPreviewView()
-    })
+    $btnCrop.disabled = true
+    croppie
+      .result('canvas')
+      .then((result: string) => {
+        $croppedImage.src = result
+        showPreviewView()
+      })
+      .catch(() => {
+        closeDialog()
+        showError(dialog.dataset.errorRead)
+      })
+      .finally(() => {
+        $btnCrop.disabled = false
+      })
   })
 
   $btnReset?.addEventListener('click', showCropView)
