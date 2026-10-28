@@ -1,5 +1,4 @@
 ---
-import Button from '@/components/ui/Button.astro'
 import Check from '@/icons/check.astro'
 import Reload from '@/icons/reload.astro'
 import Close from '@/icons/close.astro'
@@ -19,7 +18,7 @@ const { t } = Astro.props
   <button
     id="openSignModal"
     type="button"
-    class="md:hidden flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-hawaii-steel hover:border-amber-500/40 hover:bg-hawaii-steel/40 text-slate-300 hover:text-white font-medium text-sm transition-all active:scale-[0.98]"
+    class="md:hidden flex w-full min-h-12 items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-hawaii-steel hover:border-amber-500/40 hover:bg-hawaii-steel/40 text-slate-300 hover:text-white font-medium text-sm transition-all active:scale-[0.98]"
     data-empty={t.addBtn}
     data-signed={t.signedBtn}
   >
@@ -30,22 +29,24 @@ const { t } = Astro.props
   </button>
 
   <!-- Desktop: inline canvas -->
-  <div class="hidden md:flex gap-2">
+  <div class="hidden md:block">
     <canvas
-      class="border border-hawaii-steel rounded-md bg-hawaii-input"
+      class="block w-full h-auto border border-hawaii-steel hover:border-amber-500/40 rounded-lg bg-hawaii-input cursor-crosshair transition-colors"
       id="drawSignCanvas"
-      width="300"
-      height="120"
+      width="600"
+      height="200"
       style="touch-action: none;"
       data-placeholder={t.placeholder}
     ></canvas>
-    <div class="flex flex-col gap-1">
-      <Button id="sign" size="xs" shape="pill" color="success" desc={t.confirmBtn} isOnlyIcon>
-        <Check />
-      </Button>
-      <Button id="signClear" size="xs" shape="pill" color="info" desc={t.clearBtn} isOnlyIcon>
-        <Reload />
-      </Button>
+    <div class="flex justify-end mt-2">
+      <button
+        id="signClear"
+        type="button"
+        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white hover:bg-hawaii-steel/40 transition-colors"
+      >
+        <Reload class="w-3.5 h-3.5" />
+        {t.clearBtn}
+      </button>
     </div>
   </div>
 </div>
@@ -127,10 +128,14 @@ const { t } = Astro.props
     let touchStartX = 0
     let touchStartY = 0
 
+    // Pads have different resolutions; keep strokes the same weight on all
+    const scale = canvas.width / 300
+    const lineWidth = 1.5 * scale
+
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
     ctx.strokeStyle = '#ffffff'
-    ctx.lineWidth = 1.5
+    ctx.lineWidth = lineWidth
 
     function getCoords(e: MouseEvent | TouchEvent) {
       const rect = canvas.getBoundingClientRect()
@@ -225,7 +230,7 @@ const { t } = Astro.props
       drawPlaceholder(text: string) {
         ctx.save()
         ctx.fillStyle = 'rgba(255,255,255,0.25)'
-        ctx.font = '13px Arial'
+        ctx.font = `${Math.round(13 * scale)}px Arial`
         ctx.textAlign = 'center'
         ctx.fillText(text, canvas.width / 2, canvas.height / 2)
         ctx.restore()
@@ -246,7 +251,7 @@ const { t } = Astro.props
         offCtx.strokeStyle = '#000000'
         offCtx.lineCap = 'round'
         offCtx.lineJoin = 'round'
-        offCtx.lineWidth = 1.5
+        offCtx.lineWidth = lineWidth
         for (let i = 0; i < clickX.length; i++) {
           offCtx.beginPath()
           if (clickDrag[i] && i) {
@@ -283,8 +288,6 @@ const { t } = Astro.props
     // Apply after every stroke so an export never misses an unconfirmed signature
     const pad = createSignPad($desktopCanvas, applySignature)
     pad.drawPlaceholder($desktopCanvas.dataset.placeholder ?? 'Sign here')
-
-    $<HTMLButtonElement>('#sign')?.addEventListener('click', applySignature)
 
     $<HTMLButtonElement>('#signClear')?.addEventListener('click', () => {
       pad.clear($desktopCanvas.dataset.placeholder)

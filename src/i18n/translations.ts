@@ -52,7 +52,6 @@ export interface GenreOption {
 }
 
 export interface CreateIdTranslations {
-  badge: string
   title: string
   subtitle: string
   flipFront: string
@@ -73,7 +72,6 @@ export interface CreateIdTranslations {
 }
 
 export interface HeroTranslations {
-  badge: string
   title: string
   description: string
   cta: string
@@ -81,7 +79,6 @@ export interface HeroTranslations {
 }
 
 export interface AboutTranslations {
-  badge: string
   title: string
   paragraph1: string
   paragraph2: string
@@ -108,24 +105,22 @@ export interface FullTranslations {
 export const translations: Record<string, FullTranslations> = {
   es: {
     lang: 'es',
-    title: 'My McLovin ID — Crea tu ID de Superbad',
+    title: 'My McLovin ID — Creá tu ID de Superbad',
     description:
-      'Crea tu propio ID falso de McLovin de la película Superbad. Personaliza nombre, fecha de nacimiento, foto y firma.',
+      'Creá tu propio ID falso de McLovin de la película Superbad. Personalizá nombre, fecha de nacimiento, foto y firma.',
     navbar: {
       start: 'Comenzar',
     },
     hero: {
-      badge: 'Estado de Hawaii',
-      title: 'El ID más famoso del cine',
+      title: 'Hacé tu propio ID de McLovin',
       description:
-        'Crea tu propia versión del icónico documento de identidad de Fogell, el personaje más memorable de Superbad.',
+        'Poné tu nombre, tu foto y tu firma en el ID falso más famoso del cine, el de Fogell en Superbad. Gratis y sin registrarte.',
       cta: 'Crear mi ID',
       scene: 'Ver la escena',
     },
     createId: {
-      badge: 'Crea tu ID',
-      title: 'Personaliza tu documento',
-      subtitle: 'Completá los datos y descargá tu versión del ID de McLovin',
+      title: 'Completá tus datos y mirá tu ID en vivo',
+      subtitle: 'Cuando te guste cómo quedó, descargalo como imagen.',
       flipFront: 'Ver frente',
       flipBack: 'Ver reverso',
       export: 'Exportar ID',
@@ -147,7 +142,7 @@ export const translations: Record<string, FullTranslations> = {
       name: 'Nombre',
       dob: 'Fecha de nacimiento',
       genre: 'Género',
-      genrePlaceholder: 'Seleccioná una opción',
+      genrePlaceholder: 'Elegí',
       genres: [
         { value: 'F', text: 'Femenino' },
         { value: 'M', text: 'Masculino' },
@@ -155,7 +150,7 @@ export const translations: Record<string, FullTranslations> = {
       ],
       photo: {
         label: 'Subí tu foto',
-        placeholder: 'Seleccioná una imagen para tu ID',
+        placeholder: 'Elegir foto',
         cropTitle: 'Recortá tu foto',
         cropSubtitle: 'Ajustá el encuadre para tu ID',
         cropHint: 'Arrastrá y hacé zoom para ajustar',
@@ -191,8 +186,7 @@ export const translations: Record<string, FullTranslations> = {
       },
     },
     about: {
-      badge: 'Sobre el personaje',
-      title: '¿Quién es McLovin?',
+      title: 'McLovin: la historia detrás del ID',
       paragraph1:
         'McLovin es el alter ego de Fogell en la película <strong class="text-white">Superbad (conocida como Supercool en Latinoamérica)</strong> (2007), dirigida por Greg Mottola y producida por Judd Apatow. Fogell decide obtener una identificación falsa del estado de Hawaii, y cuando sus amigos le preguntan su nombre, él revela orgulloso que se llama simplemente "McLovin".',
       paragraph2:
@@ -212,17 +206,15 @@ export const translations: Record<string, FullTranslations> = {
       start: 'Get Started',
     },
     hero: {
-      badge: 'State of Hawaii',
-      title: 'The most famous ID in cinema',
+      title: 'Make your own McLovin ID',
       description:
-        "Create your own version of Fogell's iconic fake ID, the most memorable character from Superbad.",
+        "Put your name, photo and signature on the most famous fake ID in movie history: Fogell's, from Superbad. Free, no sign-up.",
       cta: 'Create my ID',
       scene: 'Watch the scene',
     },
     createId: {
-      badge: 'Create your ID',
-      title: 'Customize your document',
-      subtitle: 'Fill in the details and download your version of the McLovin ID',
+      title: 'Fill in your details and watch your ID update live',
+      subtitle: 'When you like how it looks, download it as an image.',
       flipFront: 'See front',
       flipBack: 'See back',
       export: 'Export ID',
@@ -244,7 +236,7 @@ export const translations: Record<string, FullTranslations> = {
       name: 'Name',
       dob: 'Date of birth',
       genre: 'Gender',
-      genrePlaceholder: 'Select an option',
+      genrePlaceholder: 'Choose',
       genres: [
         { value: 'F', text: 'Female' },
         { value: 'M', text: 'Male' },
@@ -252,7 +244,7 @@ export const translations: Record<string, FullTranslations> = {
       ],
       photo: {
         label: 'Upload your photo',
-        placeholder: 'Select an image for your ID',
+        placeholder: 'Choose photo',
         cropTitle: 'Crop your photo',
         cropSubtitle: 'Adjust the frame for your ID',
         cropHint: 'Drag and zoom to adjust',
@@ -288,8 +280,7 @@ export const translations: Record<string, FullTranslations> = {
       },
     },
     about: {
-      badge: 'About the character',
-      title: 'Who is McLovin?',
+      title: 'McLovin: the story behind the ID',
       paragraph1:
         'McLovin is Fogell\'s alter ego in the movie <strong class="text-white">Superbad</strong> (2007), directed by Greg Mottola and produced by Judd Apatow. Fogell decides to get a fake ID from the state of Hawaii, and when his friends ask his name, he proudly reveals he goes by simply "McLovin".',
       paragraph2:
